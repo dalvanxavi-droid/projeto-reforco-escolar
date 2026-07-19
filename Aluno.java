@@ -22,6 +22,7 @@ public class Aluno implements RelatorioEmitivel {
         this.nivelLeitura = nivelLeitura;
         this.temNecessidadeEspecial = temNecessidadeEspecial;
         this.descricaoNecessidade = descricaoNecessidade;
+        this.matricula = gerarMatricula(dataNascimento); // Para gerar a matrícula com base na data de nascimento
     }
 
     // === GETTERS (Para buscar as informações) ===
@@ -48,15 +49,15 @@ public class Aluno implements RelatorioEmitivel {
         return this.matricula;
     }
 
-   public void setDataNascimento(LocalDate dataNascimento) {
-    this.dataNascimento = dataNascimento;
-    this.matricula = gerarMatricula(dataNascimento); 
-}
+    public void setDataNascimento(LocalDate dataNascimento) {
+        this.dataNascimento = dataNascimento;
+        this.matricula = gerarMatricula(dataNascimento);
+    }
 
-private String gerarMatricula(LocalDate data) {
-    DateTimeFormatter formatador = DateTimeFormatter.ofPattern("ddMMyyyy");
-    return data.format(formatador);
-}
+    private String gerarMatricula(LocalDate data) {
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("ddMMyyyy");
+        return data.format(formatador);
+    }
 
     public String getAnoEscolar() {
         return anoEscolar;
@@ -102,7 +103,7 @@ private String gerarMatricula(LocalDate data) {
     public void exibirDadosResumidos() {
         // Aqui dentro você coloca o System.out.println para mostrar os dados básicos do
         // aluno
-        System.out.println(("Aluno: " + this.nome + " - Idade: " + getIdade() + " anos" + " - Ano Escolar: "
-                + this.anoEscolar + " - Responsável: " + this.responsavel.nome()));
+        System.out.println("Matrícula: " + this.getMatricula() + " - Aluno: " + this.nome + " - Idade: "
+                + this.getIdade() + " anos");
     }
 }

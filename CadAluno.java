@@ -1,20 +1,36 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class CadAluno {
     public static void main(String[] args) {
-        // Inicializando o leitor com o UTF-8 para aceitar os caracteres no terminal do Linux
+        // Inicializando o leitor com o UTF-8 para aceitar os caracteres no terminal do
+        // Linux
         Scanner leitor = new Scanner(System.in, "UTF-8");
         ArrayList<Aluno> ListaAlunos = new ArrayList<>();
         int continuar = 1;
+
+        // Criando o formatador para ler a data digitada pelo usuário
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         while (continuar == 1) {
             System.out.println("=== TESTE DE CADASTRO DE ALUNO ===");
             System.out.print("Digite o nome do aluno: ");
             String nomeAluno = leitor.nextLine();
 
-            System.out.print("Digite a idade do aluno: ");
-            String idadeAluno = leitor.nextLine();
+            // Validação da Data de Nascimento para não quebrar o programa
+            LocalDate dataNascimento = null;
+            while (dataNascimento == null) {
+                System.out.print("Digite a data de nascimento do aluno (dd/mm/aaaa): ");
+                String dataTexto = leitor.nextLine();
+
+                try {
+                    dataNascimento = LocalDate.parse(dataTexto, formatador);
+                } catch (Exception e) {
+                    System.out.println("Formato inválido! Você precisa digitar com as barras. Exemplo: 22/10/2020");
+                }
+            }
 
             System.out.print("Digite em qual ano escolar o aluno está: ");
             String anoAluno = leitor.nextLine();
@@ -102,8 +118,9 @@ public class CadAluno {
                 }
             }
 
-            // Criando o objeto Aluno com todos os dados coletados
-            Aluno dadosAluno = new Aluno(nomeAluno, idadeAluno, anoAluno, responsavelAluno, nivelSelecionado,
+            // Criando o objeto Aluno passando dataNascimento no lugar da antiga idadeAluno
+            // string
+            Aluno dadosAluno = new Aluno(nomeAluno, dataNascimento, anoAluno, responsavelAluno, nivelSelecionado,
                     temNecessidadeEspecial, descricaoNecessidade);
             ListaAlunos.add(dadosAluno);
 
@@ -123,6 +140,8 @@ public class CadAluno {
         System.out.println("--- RELATÓRIO RÁPIDO DOS ALUNOS CADASTRADOS ---");
         for (Aluno aluno : ListaAlunos) {
             aluno.exibirDadosResumidos();
+
         }
+        leitor.close();
     }
 }
