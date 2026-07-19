@@ -7,6 +7,7 @@ public class Aluno implements RelatorioEmitivel {
     private LocalDate dataNascimento;
     private String anoEscolar;
     private String matricula;
+    private static int contadorSequencial = 1;
     private Responsavel responsavel;
     private NivelLeitura nivelLeitura;
     private boolean temNecessidadeEspecial;
@@ -55,9 +56,17 @@ public class Aluno implements RelatorioEmitivel {
     }
 
     private String gerarMatricula(LocalDate data) {
-        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("ddMMyyyy");
-        return data.format(formatador);
-    }
+    DateTimeFormatter formatador = DateTimeFormatter.ofPattern("ddMMyyyy");
+    String dataFormatada = data.format(formatador);
+    
+    // Formata o número com 3 dígitos (ex: 1 vira "001")
+    String sufixo = String.format("%03d", contadorSequencial);
+    
+    // Incrementa o contador global para o próximo aluno
+    contadorSequencial++; 
+    
+    return dataFormatada + sufixo;
+}
 
     public String getAnoEscolar() {
         return anoEscolar;
