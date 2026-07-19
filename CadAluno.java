@@ -122,8 +122,7 @@ public class CadAluno {
         System.out.println("Até logo, Lidiane! Cadastro encerrado.");
         System.out.println("--- RELATÓRIO RÁPIDO DOS ALUNOS CADASTRADOS ---");
         for (Aluno aluno : ListaAlunos) {
-            System.out.println("Aluno: " + aluno.getNome() + " - Idade: " + aluno.getIdade() + " - Ano Escolar: "
-                    + aluno.getAnoEscolar() + " - Responsável: " + aluno.getResponsavel().nome());
+            aluno.exibirDadosResumidos();
         }
     }
 }
