@@ -5,143 +5,191 @@ import java.util.Scanner;
 
 public class CadAluno {
     public static void main(String[] args) {
-        // Inicializando o leitor com o UTF-8 para aceitar os caracteres no terminal do
-        // Linux
         Scanner leitor = new Scanner(System.in, "UTF-8");
-        ArrayList<Aluno> ListaAlunos = new ArrayList<>();
-        int continuar = 1;
-
-        // Criando o formatador para ler a data digitada pelo usuário
+        ArrayList<Aluno> ListaAlunos = GerenciadorArquivo.carregarAlunos();
         DateTimeFormatter formatador = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        while (continuar == 1) {
-            System.out.println("=== TESTE DE CADASTRO DE ALUNO ===");
-            System.out.print("Digite o nome do aluno: ");
-            String nomeAluno = leitor.nextLine();
+        int opcao = 0;
 
-            // Validação da Data de Nascimento para não quebrar o programa
-            LocalDate dataNascimento = null;
-            while (dataNascimento == null) {
-                System.out.print("Digite a data de nascimento do aluno (dd/mm/aaaa): ");
-                String dataTexto = leitor.nextLine();
+        while (opcao != 5) {
+            System.out.println("\n=== MENU PRINCIPAL ===");
+            System.out.println("1 - Cadastrar Aluno");
+            System.out.println("2 - Encontrar Aluno Cadastrado");
+            System.out.println("3 - Remover Aluno");
+            System.out.println("4 - Relatório");
+            System.out.println("5 - Sair");
+            System.out.print("Escolha uma opção: ");
 
-                try {
-                    dataNascimento = LocalDate.parse(dataTexto, formatador);
-                } catch (Exception e) {
-                    System.out.println("Formato inválido! Você precisa digitar com as barras. Exemplo: 22/10/2020");
-                }
+            try {
+                opcao = Integer.parseInt(leitor.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("⚠️ Entrada inválida! Digite apenas números de 1 a 5.");
+                continue; // Pula o switch e reinicia o menu
             }
 
-            System.out.print("Digite em qual ano escolar o aluno está: ");
-            String anoAluno = leitor.nextLine();
+            switch (opcao) {
+                case 1:
+                    System.out.println("\n=== CADASTRO DE ALUNO ===");
+                    System.out.print("Digite o nome do aluno: ");
+                    String nomeAluno = leitor.nextLine();
 
-            System.out.print("Nome do(a) responsável: ");
-            String nomeResponsavel = leitor.nextLine();
+                    LocalDate dataNascimento = null;
+                    while (dataNascimento == null) {
+                        System.out.print("Digite a data de nascimento do aluno (dd/mm/aaaa): ");
+                        String dataTexto = leitor.nextLine();
+                        try {
+                            dataNascimento = LocalDate.parse(dataTexto, formatador);
+                        } catch (Exception e) {
+                            System.out.println("Formato inválido! Use o padrão dd/mm/aaaa.");
+                        }
+                    }
 
-            System.out.print("Telefone para contato: ");
-            String telefoneResponsavel = leitor.nextLine();
+                    if (alunoJaExiste(ListaAlunos, nomeAluno, dataNascimento)) {
+                        System.out.println("⚠️ Aluno já cadastrado no sistema!");
+                        break;
+                    }
 
-            System.out.print("Endereço: ");
-            String enderecoResponsavel = leitor.nextLine();
+                    System.out.print("Digite em qual ano escolar o aluno está: ");
+                    String anoAluno = leitor.nextLine();
 
-            // Criando o objeto Responsavel com a ordem corrigida: nome, telefone, endereco
-            Responsavel responsavelAluno = new Responsavel(nomeResponsavel, telefoneResponsavel, enderecoResponsavel);
+                    System.out.print("Nome do(a) responsável: ");
+                    String nomeResponsavel = leitor.nextLine();
 
-            NivelLeitura nivelSelecionado = null;
-            while (nivelSelecionado == null) {
-                System.out.print("Em qual nível de leitura o aluno se encontra? Escolha uma das opções a seguir. \n");
-                System.out.print("Digite o número da opção escolhida: \n");
-                System.out.println("""
-                        1 - ICONICO
-                        2 - GARATUJA
-                        3 - PRE_SILABICA
-                        4 - SILABICA_SEM_VALOR_SONORO
-                        5 - SILABICA_COM_VALOR_SONORO
-                        6 - SILABICA_ALFABETICA
-                        7 - ALFABETICA
-                        8 - ORTOGRAFICA """);
+                    System.out.print("Telefone para contato: ");
+                    String telefoneResponsavel = leitor.nextLine();
 
-                int nivelLeitura = leitor.nextInt();
-                leitor.nextLine(); // Limpa o buffer do teclado
+                    System.out.print("Endereço: ");
+                    String enderecoResponsavel = leitor.nextLine();
 
-                if (nivelLeitura == 1) {
-                    nivelSelecionado = NivelLeitura.ICONICO;
-                    System.out.println("Você escolheu a opção " + NivelLeitura.ICONICO);
-                } else if (nivelLeitura == 2) {
-                    nivelSelecionado = NivelLeitura.GARATUJA;
-                    System.out.println("Você escolheu a opção " + NivelLeitura.GARATUJA);
-                } else if (nivelLeitura == 3) {
-                    nivelSelecionado = NivelLeitura.PRE_SILABICA;
-                    System.out.println("Você escolheu a opção " + NivelLeitura.PRE_SILABICA);
-                } else if (nivelLeitura == 4) {
-                    nivelSelecionado = NivelLeitura.SILABICA_SEM_VALOR_SONORO;
-                    System.out.println("Você escolheu a opção " + NivelLeitura.SILABICA_SEM_VALOR_SONORO);
-                } else if (nivelLeitura == 5) {
-                    nivelSelecionado = NivelLeitura.SILABICA_COM_VALOR_SONORO;
-                    System.out.println("Você escolheu a opção " + NivelLeitura.SILABICA_COM_VALOR_SONORO);
-                } else if (nivelLeitura == 6) {
-                    nivelSelecionado = NivelLeitura.SILABICA_ALFABETICA;
-                    System.out.println("Você escolheu a opção " + NivelLeitura.SILABICA_ALFABETICA);
-                } else if (nivelLeitura == 7) {
-                    nivelSelecionado = NivelLeitura.ALFABETICA;
-                    System.out.println("Você escolheu a opção " + NivelLeitura.ALFABETICA);
-                } else if (nivelLeitura == 8) {
-                    nivelSelecionado = NivelLeitura.ORTOGRAFICA;
-                    System.out.println("Você escolheu a opção " + NivelLeitura.ORTOGRAFICA);
-                } else {
-                    System.out.println("Opção inválida! Por favor, escolha uma opção de 1 à 8. ");
-                }
-            }
+                    Responsavel responsavelAluno = new Responsavel(nomeResponsavel, telefoneResponsavel,
+                            enderecoResponsavel);
 
-            boolean temNecessidadeEspecial = false;
-            String descricaoNecessidade = "";
-            int opcao = 0;
-            while (opcao != 1 && opcao != 2) {
-                System.out.print("O(a) aluno(a) possui necessidade especial de aprendizagem? \n");
-                System.out.println("""
-                        1 - SIM
-                        2 - NÃO""");
+                    NivelLeitura nivelSelecionado = null;
+                    while (nivelSelecionado == null) {
+                        System.out.println(
+                                "Em qual nível de leitura o aluno se encontra?\n1 - ICONICO\n2 - GARATUJA\n3 - PRE_SILABICA\n4 - SILABICA_SEM_VALOR_SONORO\n5 - SILABICA_COM_VALOR_SONORO\n6 - SILABICA_ALFABETICA\n7 - ALFABETICA\n8 - ORTOGRAFICA");
+                        int nivelLeitura = leitor.nextInt();
+                        leitor.nextLine();
 
-                opcao = leitor.nextInt();
-                leitor.nextLine(); // Limpa o buffer do teclado
+                        if (nivelLeitura >= 1 && nivelLeitura <= 8) {
+                            nivelSelecionado = NivelLeitura.values()[nivelLeitura - 1];
+                            System.out.println("Você escolheu: " + nivelSelecionado);
+                        } else {
+                            System.out.println("Opção inválida!");
+                        }
+                    }
 
-                if (opcao == 1) {
-                    temNecessidadeEspecial = true;
-                    System.out.println("Digite a necessidade especial do(a) aluno(a)");
-                    descricaoNecessidade = leitor.nextLine();
-                    System.out.println("Aluno cadastrado com sucesso");
-                } else if (opcao == 2) {
-                    temNecessidadeEspecial = false;
-                    System.out.println("Aluno cadastrado com sucesso");
-                } else {
-                    System.out.println("Opção inválida! Por favor, escolha a opção entre 1 ou 2. ");
-                }
-            }
+                    boolean temNecessidadeEspecial = false;
+                    String descricaoNecessidade = "";
+                    int opNecessidade = 0;
+                    while (opNecessidade != 1 && opNecessidade != 2) {
+                        System.out.println("O(a) aluno(a) possui necessidade especial?\n1 - SIM\n2 - NÃO");
+                        opNecessidade = leitor.nextInt();
+                        leitor.nextLine();
 
-            // Criando o objeto Aluno passando dataNascimento no lugar da antiga idadeAluno
-            // string
-            Aluno dadosAluno = new Aluno(nomeAluno, dataNascimento, anoAluno, responsavelAluno, nivelSelecionado,
-                    temNecessidadeEspecial, descricaoNecessidade);
-            ListaAlunos.add(dadosAluno);
+                        if (opNecessidade == 1) {
+                            temNecessidadeEspecial = true;
+                            System.out.print("Digite laudo/descrição: ");
+                            descricaoNecessidade = leitor.nextLine();
+                        }
+                    }
 
-            System.out.println("Deseja cadastrar mais um aluno? (1 - SIM / 2 - NÃO): ");
-            continuar = leitor.nextInt();
-            leitor.nextLine(); // Limpa o buffer do teclado
+                    Aluno dadosAluno = new Aluno(nomeAluno, dataNascimento, anoAluno, responsavelAluno,
+                            nivelSelecionado, temNecessidadeEspecial, descricaoNecessidade);
+                    ListaAlunos.add(dadosAluno);
+                    GerenciadorArquivo.salvarAlunos(ListaAlunos);
+                    System.out.println("✅ Aluno cadastrado com sucesso!");
+                    break;
 
-            while (continuar != 1 && continuar != 2) {
-                System.out.println("Opção inválida! Por favor, escolha entre 1 ou 2.");
-                System.out.println("Deseja cadastrar mais um aluno? (1 - SIM / 2 - NÃO):");
-                continuar = leitor.nextInt();
-                leitor.nextLine();
+                case 2:
+                    System.out.println("\n=== ENCONTRAR ALUNO ===");
+                    System.out.print("Digite o nome do aluno que busca: ");
+                    String buscaNome = leitor.nextLine();
+                    boolean encontrado = false;
+                    for (Aluno a : ListaAlunos) {
+                        if (a.getNome().equalsIgnoreCase(buscaNome)) {
+                            a.exibirDadosResumidos();
+                            encontrado = true;
+                        }
+                    }
+                    if (!encontrado)
+                        System.out.println("❌ Aluno não encontrado.");
+                    break;
+
+                case 3:
+                    System.out.println("\n=== REMOVER ALUNO ===");
+                    System.out.print("Digite o nome do aluno que deseja remover: ");
+                    String nomeParaRemover = leitor.nextLine();
+                    removerAluno(ListaAlunos, nomeParaRemover, leitor);
+                    GerenciadorArquivo.salvarAlunos(ListaAlunos);
+                    break;
+
+                case 4:
+                    System.out.println("\n--- RELATÓRIO RÁPIDO DOS ALUNOS CADASTRADOS ---");
+                    if (ListaAlunos.isEmpty()) {
+                        System.out.println("Nenhum aluno cadastrado.");
+                    } else {
+                        for (Aluno aluno : ListaAlunos) {
+                            aluno.exibirDadosResumidos();
+                        }
+                    }
+                    break;
+
+                case 5:
+                    System.out.println("Até logo, Lidiane! Salvando dados e encerrando...");
+                    break;
+
+                default:
+                    System.out.println("Opção inválida! Escolha de 1 a 5.");
             }
         }
 
-        System.out.println("Até logo, Lidiane! Cadastro encerrado.");
-        System.out.println("--- RELATÓRIO RÁPIDO DOS ALUNOS CADASTRADOS ---");
-        for (Aluno aluno : ListaAlunos) {
-            aluno.exibirDadosResumidos();
-
-        }
         leitor.close();
+        GerenciadorArquivo.salvarAlunos(ListaAlunos);
+    } // Fim do método main
+
+    // RESTRUTURADOS ABAIXO DO MAIN:
+    public static boolean alunoJaExiste(ArrayList<Aluno> lista, String nome, LocalDate dataNasc) {
+        for (Aluno aluno : lista) {
+            if (aluno.getNome().equalsIgnoreCase(nome) && aluno.getDataNascimento().equals(dataNasc)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void removerAluno(ArrayList<Aluno> lista, String nome, Scanner leitor) {
+    // 1. Procura se o aluno existe na lista antes de tentar deletar
+    Aluno alunoEncontrado = null;
+    for (Aluno aluno : lista) {
+        if (aluno.getNome().equalsIgnoreCase(nome)) {
+            alunoEncontrado = aluno;
+            break;
+        }
+    }
+
+    if (alunoEncontrado == null) {
+        System.out.println("❌ Aluno não encontrado.");
+        return;
+    }
+
+    // 2. Se encontrou, pede a confirmação de segurança
+    System.out.println("\n⚠️ ATENÇÃO: Você tem certeza que deseja remover o(a) aluno(a): " + alunoEncontrado.getNome() + "?");
+    System.out.println("1 - SIM\n2 - NÃO");
+    System.out.print("Escolha uma opção: ");
+    
+    int conf = 0;
+    try {
+        conf = Integer.parseInt(leitor.nextLine());
+    } catch (NumberFormatException e) {
+        // Se digitar letra, assume como não por segurança
+    }
+
+    if (conf == 1) {
+        lista.remove(alunoEncontrado);
+        System.out.println("🗑️ Aluno removido da lista com sucesso!");
+    } else {
+        System.out.println("❌ Operação cancelada. O aluno não foi removido.");
     }
 }
+} // Fim da classe CadAluno

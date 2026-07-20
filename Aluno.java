@@ -26,6 +26,24 @@ public class Aluno implements RelatorioEmitivel {
         this.matricula = gerarMatricula(dataNascimento); // Para gerar a matrícula com base na data de nascimento
     }
 
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
+    }
+
+    // Segundo construtor para o banco de dados em arquivo
+    public Aluno(String nome, LocalDate dataNascimento, String anoEscolar) {
+        this.nome = nome;
+        this.dataNascimento = dataNascimento;
+        this.anoEscolar = anoEscolar;
+        this.matricula = gerarMatricula(dataNascimento); // Garante que gera a matrícula sequencial!
+
+        // Inicializa os outros campos vazios/padrão por enquanto
+        this.responsavel = null;
+        this.nivelLeitura = null;
+        this.temNecessidadeEspecial = false;
+        this.descricaoNecessidade = "";
+    }
+
     // === GETTERS (Para buscar as informações) ===
     public String getNome() {
         return nome;
@@ -56,17 +74,17 @@ public class Aluno implements RelatorioEmitivel {
     }
 
     private String gerarMatricula(LocalDate data) {
-    DateTimeFormatter formatador = DateTimeFormatter.ofPattern("ddMMyyyy");
-    String dataFormatada = data.format(formatador);
-    
-    // Formata o número com 3 dígitos (ex: 1 vira "001")
-    String sufixo = String.format("%03d", contadorSequencial);
-    
-    // Incrementa o contador global para o próximo aluno
-    contadorSequencial++; 
-    
-    return dataFormatada + sufixo;
-}
+        DateTimeFormatter formatador = DateTimeFormatter.ofPattern("ddMMyyyy");
+        String dataFormatada = data.format(formatador);
+
+        // Formata o número com 3 dígitos (ex: 1 vira "001")
+        String sufixo = String.format("%03d", contadorSequencial);
+
+        // Incrementa o contador global para o próximo aluno
+        contadorSequencial++;
+
+        return dataFormatada + sufixo;
+    }
 
     public String getAnoEscolar() {
         return anoEscolar;
@@ -113,6 +131,7 @@ public class Aluno implements RelatorioEmitivel {
         // Aqui dentro você coloca o System.out.println para mostrar os dados básicos do
         // aluno
         System.out.println("Matrícula: " + this.getMatricula() + " - Aluno: " + this.nome + " - Idade: "
-                + this.getIdade() + " anos");
+                + this.getIdade() + " anos" + " - Responsável: " + this.responsavel.nome() +
+                " - Contato: " + this.responsavel.telefone());
     }
 }
