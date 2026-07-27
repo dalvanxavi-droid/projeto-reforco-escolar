@@ -255,7 +255,11 @@
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
-            display: none;
+            transition: 0.3s;
+        }
+        
+        .btn-cancelar:hover {
+            background-color: #7f8c8d;
         }
 
         .btn-perigo {
@@ -557,6 +561,17 @@
                             <label>Endereço do Responsável:</label>
                             <input type="text" id="enderecoResponsavel" required placeholder="Ex: Rua das Flores, 123">
                         </div>
+                        <div class="form-group">
+                            <label>Valor do Contrato (R$):</label>
+                            <input type="number" step="0.01" id="valorContrato" required value="1800.00">
+                        </div>
+                        <div class="form-group">
+                            <label>Ciclo de Pagamento:</label>
+                            <select id="cicloPagamento" required>
+                                <option value="MENSAL">MENSAL</option>
+                                <option value="SEMANAL">SEMANAL</option>
+                            </select>
+                        </div>
                         <div class="form-group checkbox-group">
                             <input type="checkbox" id="temNecessidadeEspecial" onchange="toggleNecessidadeDesc()">
                             <label for="temNecessidadeEspecial">NEE?</label>
@@ -566,9 +581,11 @@
                             <input type="text" id="descricaoNecessidade" placeholder="Ex: Dislexia, TDAH...">
                         </div>
                     </div>
-                    <button type="submit" id="btnSubmit" class="btn-salvar">Cadastrar Aluno</button>
-                    <button type="button" id="btnCancelar" onclick="limparFormulario()" class="btn-cancelar">Cancelar
-                        Edição</button>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button type="submit" id="btnSubmit" class="btn-salvar">Cadastrar Aluno</button>
+                        <button type="button" id="btnCancelar" onclick="limparFormulario()" class="btn-cancelar">Cancelar</button>
+                    </div>
                 </form>
             </div>
 
@@ -585,6 +602,7 @@
                             <th>Nome do Aluno</th>
                             <th>Ano Escolar</th>
                             <th>Nível de Leitura</th>
+                            <th>Valor / Ciclo</th>
                             <th>Responsável (Endereço)</th>
                             <th>NEE</th>
                             <th>Ações</th>
@@ -688,15 +706,15 @@
 
             <div class="table-container">
                 <h3>Controle Financeiro</h3>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Aqui você acompanhará os pagamentos e
-                    mensalidades.</p>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Acompanhamento de pagamentos e contratos dos alunos.</p>
                 <div id="conteudo-financeiro">
                     <table>
                         <thead>
                             <tr>
                                 <th>Matrícula</th>
                                 <th>Nome do Aluno</th>
-                                <th>Ano Escolar</th>
+                                <th>Valor do Contrato</th>
+                                <th>Ciclo</th>
                                 <th>Status de Pagamento</th>
                                 <th>Ações</th>
                             </tr>
@@ -1002,6 +1020,8 @@
                 const respNome = aluno.responsavelNome || aluno.nomeResponsavel || 'Não Cadastrado';
                 const respFone = aluno.responsavelTelefone || aluno.telefoneResponsavel || '--';
                 const respEnd = aluno.responsavelEndereco || aluno.enderecoResponsavel || 'Não informado';
+                const valorContrato = aluno.valorContrato !== undefined ? aluno.valorContrato : 0.0;
+                const cicloPagamento = aluno.cicloPagamento || 'MENSAL';
 
                 const temNee = aluno.temNecessidadeEspecial !== undefined ? aluno.temNecessidadeEspecial : aluno.temNecessidade;
 
@@ -1011,6 +1031,7 @@
                     <td>${aluno.nome}</td>
                     <td>${aluno.anoEscolar}</td>
                     <td>${aluno.nivelLeitura}</td>
+                    <td>R$ ${valorContrato.toFixed(2).replace('.', ',')} <br><small style="color:#666;">${cicloPagamento}</small></td>
                     <td>${respNome} (${respFone})<br><small style="color:#666;">📍 ${respEnd}</small></td>
                     <td>${temNee ? `<span class="badge-necessidade" onclick="alternarNEE('${aluno.matricula}')" title="Clique para ver a necessidade">Sim</span>` : '--'}</td>
                     <td>
@@ -1040,6 +1061,8 @@
             document.getElementById('dataNascimento').value = aluno.dataNascimento || '';
             document.getElementById('anoEscolar').value = aluno.anoEscolar;
             document.getElementById('nivelLeitura').value = aluno.nivelLeitura;
+            document.getElementById('valorContrato').value = aluno.valorContrato !== undefined ? aluno.valorContrato : 1800.00;
+            document.getElementById('cicloPagamento').value = aluno.cicloPagamento || 'MENSAL';
 
             document.getElementById('nomeResponsavel').value = aluno.responsavelNome || aluno.nomeResponsavel || '';
             document.getElementById('telefoneResponsavel').value = aluno.telefoneResponsavel || aluno.responsavelTelefone || '';
@@ -1053,7 +1076,6 @@
 
             document.getElementById('form-titulo').innerText = 'Editar Aluno';
             document.getElementById('btnSubmit').innerText = 'Salvar Alterações';
-            document.getElementById('btnCancelar').style.display = 'inline-block';
 
             navegar('alunos');
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1064,7 +1086,6 @@
             document.getElementById('matriculaEditando').value = '';
             document.getElementById('form-titulo').innerText = 'Novo Cadastro de Aluno';
             document.getElementById('btnSubmit').innerText = 'Cadastrar Aluno';
-            document.getElementById('btnCancelar').style.display = 'none';
             toggleNecessidadeDesc();
         }
 
@@ -1106,6 +1127,8 @@
             const endResp = document.getElementById('enderecoResponsavel').value;
             const descNee = document.getElementById('descricaoNecessidade').value;
             const temNee = document.getElementById('temNecessidadeEspecial').checked;
+            const valorContrato = parseFloat(document.getElementById('valorContrato').value) || 0.0;
+            const cicloPagamento = document.getElementById('cicloPagamento').value;
 
             const dadosAluno = {
                 matricula: matricula,
@@ -1120,7 +1143,9 @@
                 enderecoResponsavel: endResp,
                 responsavelEndereco: endResp,
                 temNecessidadeEspecial: temNee,
-                descricaoNecessidade: descNee
+                descricaoNecessidade: descNee,
+                valorContrato: valorContrato,
+                cicloPagamento: cicloPagamento
             };
 
             await fetch('/api/alunos', {
@@ -1478,23 +1503,26 @@
 
                     alunos.forEach(aluno => {
                         const status = aluno.statusPagamento || 'PENDENTE';
+                        const valorContrato = aluno.valorContrato !== undefined ? aluno.valorContrato : 0.0;
+                        const cicloPagamento = aluno.cicloPagamento || 'MENSAL';
                         
                         if (status === 'EM_DIA') {
-                            totalRecebido += 150.0;
+                            totalRecebido += valorContrato;
                         } else {
-                            totalPendente += 150.0;
+                            totalPendente += valorContrato;
                         }
 
                         const tr = document.createElement('tr');
                         tr.innerHTML = `
                             <td>${aluno.matricula}</td>
                             <td>${aluno.nome}</td>
-                            <td>${aluno.anoEscolar}</td>
+                            <td>R$ ${valorContrato.toFixed(2).replace('.', ',')}</td>
+                            <td>${cicloPagamento}</td>
                             <td>${aluno.statusPagamentoDesc || 'Pendente'}</td>
                             <td>
-                                <button onclick="mudarStatus('${aluno.matricula}', 'EM_DIA')">✅ Em dia</button>
-                                <button onclick="mudarStatus('${aluno.matricula}', 'PENDENTE')">⏳ Pendente</button>
-                                <button onclick="mudarStatus('${aluno.matricula}', 'ATRASADO')">❌ Atrasado</button>
+                                <button onclick="mudarStatus('${aluno.nome}', 'EM_DIA')">✅ Em dia</button>
+                                <button onclick="mudarStatus('${aluno.nome}', 'PENDENTE')">⏳ Pendente</button>
+                                <button onclick="mudarStatus('${aluno.nome}', 'ATRASADO')">❌ Atrasado</button>
                             </td>
                         `;
                         tbody.appendChild(tr);
@@ -1507,7 +1535,7 @@
         }
 
         function mudarStatus(matricula, novoStatus) {
-            fetch(`/api/alunos/status?matricula=${matricula}&status=${novoStatus}`, {
+            fetch(`/api/alunos/status?matricula=${encodeURIComponent(matricula)}&status=${novoStatus}`, {
                 method: 'PUT'
             })
             .then(response => {

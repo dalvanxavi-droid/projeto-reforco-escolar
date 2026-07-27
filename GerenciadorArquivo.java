@@ -15,7 +15,7 @@ public class GerenciadorArquivo {
                 PrintWriter pw = new PrintWriter(fw)) {
 
             for (Aluno aluno : listaAlunos) {
-                // Junta os dados do aluno separados por ponto e vírgula
+                // Junta os dados do aluno separados por ponto e vírgula, incluindo o financeiro
                 pw.println(
                         aluno.getNome() + ";" +
                                 aluno.getDataNascimento().format(formatadorTxt) + ";" +
@@ -26,7 +26,9 @@ public class GerenciadorArquivo {
                                 aluno.getResponsavel().nome() + ";" +
                                 aluno.getResponsavel().telefone() + ";" +
                                 aluno.getResponsavel().endereco() + ";" +
-                                aluno.getStatusPagamento().name());
+                                aluno.getStatusPagamento().name() + ";" +
+                                aluno.getValorContrato() + ";" +
+                                aluno.getCicloPagamento());
                                 
             }
             System.out.println("💾 Dados salvos com sucesso em " + CAMINHO_ARQUIVO);
@@ -44,7 +46,6 @@ public class GerenciadorArquivo {
             return lista;
         }
 
-        // Criamos o formatador brasileiro aqui para a leitura
         java.time.format.DateTimeFormatter formatadorTxt = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
         try (java.io.BufferedReader br = new java.io.BufferedReader(
@@ -52,7 +53,7 @@ public class GerenciadorArquivo {
             String linha;
             while ((linha = br.readLine()) != null) {
                 String[] partes = linha.split(";");
-                if (partes.length >= 10) { // Ajustado para 10 campos salvos
+                if (partes.length >= 12) { // Atualizado para suportar os 12 campos
 
                     String nome = partes[0];
                     LocalDate dataNasc = LocalDate.parse(partes[1], formatadorTxt);
@@ -64,10 +65,13 @@ public class GerenciadorArquivo {
                     String telResp = partes[7];
                     String endResp = partes[8];
                     StatusPagamento statusPagamento = StatusPagamento.valueOf(partes[9]);
+                    double valorContrato = Double.parseDouble(partes[10]);
+                    String cicloPagamento = partes[11];
+                    
                     Responsavel resp = new Responsavel(nomeResp, telResp, endResp);
 
-                    Aluno aluno = new Aluno(nome, dataNasc, anoEscolar, resp, nivelLeitura, temNecessidade,
-                            descNecessidade, statusPagamento);
+                    Aluno aluno = new Aluno(nome, dataNasc, anoEscolar, resp, nivelLeitura, temNecessidade, 
+                            descNecessidade, statusPagamento, valorContrato, cicloPagamento);
 
                     lista.add(aluno);
                 }
@@ -125,5 +129,4 @@ public class GerenciadorArquivo {
 
         return lista;
     }
-
 }

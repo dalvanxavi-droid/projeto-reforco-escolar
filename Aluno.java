@@ -10,10 +10,14 @@ public class Aluno {
     private boolean temNecessidadeEspecial;
     private String descricaoNecessidade;
     private StatusPagamento statusPagamento;
+    private double valorContrato;
+    private String cicloPagamento;
 
     public Aluno() {}
 
-    public Aluno(String nome, LocalDate dataNascimento, String anoEscolar, Responsavel responsavel, NivelLeitura nivelLeitura, boolean temNecessidadeEspecial, String descricaoNecessidade, StatusPagamento statusPagamento) {
+    public Aluno(String nome, LocalDate dataNascimento, String anoEscolar, Responsavel responsavel, 
+        NivelLeitura nivelLeitura, boolean temNecessidadeEspecial, 
+        String descricaoNecessidade, StatusPagamento statusPagamento, double valorContrato, String cicloPagamento) {
         this.nome = nome;
         this.dataNascimento = dataNascimento;
         this.anoEscolar = anoEscolar;
@@ -22,10 +26,17 @@ public class Aluno {
         this.temNecessidadeEspecial = temNecessidadeEspecial;
         this.descricaoNecessidade = descricaoNecessidade;
         this.statusPagamento = statusPagamento;
+        this.valorContrato = valorContrato;
+        this.cicloPagamento = cicloPagamento;
     }
 
+// Getters e Setters essenciais
+    public double getValorContrato() { return valorContrato; }
+    public void setValorContrato(double valorContrato) { this.valorContrato = valorContrato; }
 
-    // Getters e Setters essenciais
+    public String getCicloPagamento() { return cicloPagamento; }
+    public void setCicloPagamento(String cicloPagamento) { this.cicloPagamento = cicloPagamento; }
+
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
 

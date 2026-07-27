@@ -55,13 +55,15 @@ public class ServidorWeb {
                         contadorDatas.put(dataBaseStr, seq);
                         String matriculaGerada = dataBaseStr + String.format("%03d", seq);
 
-                        json.append(String.format(
-                                "{\"matricula\":\"%s\",\"nome\":\"%s\",\"dataNascimento\":\"%s\",\"anoEscolar\":\"%s\",\"nivelLeitura\":\"%s\",\"temNecessidade\":%b,\"descricaoNecessidade\":\"%s\",\"responsavelNome\":\"%s\",\"responsavelTelefone\":\"%s\",\"responsavelEndereco\":\"%s\",\"statusPagamento\":\"%s\",\"statusPagamentoDesc\":\"%s\"}",
+                        // Montando o JSON com Locale.US para garantir o ponto decimal ao invés de vírgula
+                        json.append(String.format(java.util.Locale.US,
+                                "{\"matricula\":\"%s\",\"nome\":\"%s\",\"dataNascimento\":\"%s\",\"anoEscolar\":\"%s\",\"nivelLeitura\":\"%s\",\"temNecessidade\":%b,\"descricaoNecessidade\":\"%s\",\"responsavelNome\":\"%s\",\"responsavelTelefone\":\"%s\",\"responsavelEndereco\":\"%s\",\"statusPagamento\":\"%s\",\"statusPagamentoDesc\":\"%s\",\"valorContrato\":%.2f,\"cicloPagamento\":\"%s\"}",
                                 matriculaGerada, a.getNome(), a.getDataNascimento(), a.getAnoEscolar(),
                                 a.getNivelLeitura(),
                                 a.isTemNecessidadeEspecial(),
                                 a.getDescricaoNecessidade() != null ? a.getDescricaoNecessidade() : "", respNome,
-                                respFone, respEnd, statusPag, statusPagDesc));
+                                respFone, respEnd, statusPag, statusPagDesc,
+                                a.getValorContrato(), a.getCicloPagamento() != null ? a.getCicloPagamento() : "MENSAL"));
 
                         if (i < alunos.size() - 1)
                             json.append(",");
@@ -92,8 +94,14 @@ public class ServidorWeb {
                     Responsavel resp = new Responsavel(nomeResp, foneResp, endResp);
                     String descNee = extrairValorJson(body, "descricaoNecessidade");
 
+                    // Lendo valores financeiros vindos da requisição (com fallback seguro)
+                    String valorStr = extrairValorJson(body, "valorContrato");
+                    double valorContrato = (valorStr != null && !valorStr.isEmpty()) ? Double.parseDouble(valorStr) : 1800.0;
+                    String cicloPagamento = extrairValorJson(body, "cicloPagamento");
+                    if (cicloPagamento == null || cicloPagamento.isEmpty()) cicloPagamento = "MENSAL";
+
                     alunos.add(new Aluno(nome, dataNasc, anoEscolar, resp, nivel, temNecessidade, descNee,
-                            StatusPagamento.PENDENTE));
+                            StatusPagamento.PENDENTE, valorContrato, cicloPagamento));
                     GerenciadorArquivo.salvarAlunos(new ArrayList<>(alunos));
 
                     String response = "{\"status\":\"sucesso\"}";
@@ -122,6 +130,17 @@ public class ServidorWeb {
                             String foneResp = extrairValorJson(body, "telefoneResponsavel");
                             String endResp = extrairValorJson(body, "enderecoResponsavel");
                             a.setResponsavel(new Responsavel(nomeResp, foneResp, endResp));
+
+                            // Atualizando dados financeiros se enviados na edição
+                            String valorStr = extrairValorJson(body, "valorContrato");
+                            if (valorStr != null && !valorStr.isEmpty()) {
+                                a.setValorContrato(Double.parseDouble(valorStr));
+                            }
+                            String ciclo = extrairValorJson(body, "cicloPagamento");
+                            if (ciclo != null && !ciclo.isEmpty()) {
+                                a.setCicloPagamento(ciclo);
+                            }
+
                             break;
                         }
                     }
@@ -147,7 +166,6 @@ public class ServidorWeb {
                     while (iterator.hasNext()) {
                         Aluno a = iterator.next();
                         
-                        // Recria a lógica de matrícula para encontrar o aluno correto
                         String dataBaseStr = "00000000";
                         if (a.getDataNascimento() != null) {
                             dataBaseStr = a.getDataNascimento().format(java.time.format.DateTimeFormatter.ofPattern("ddMMyyyy"));
@@ -156,10 +174,9 @@ public class ServidorWeb {
                         contadorDatas.put(dataBaseStr, seq);
                         String matriculaGerada = dataBaseStr + String.format("%03d", seq);
 
-                        // Compara a matrícula gerada com a que veio do Front-End
                         if (matriculaGerada.equals(matricula.trim())) {
                             iterator.remove();
-                            break; // Achou e excluiu, pode parar o loop
+                            break;
                         }
                     }
 
@@ -177,7 +194,6 @@ public class ServidorWeb {
 
         // ROTA API: AGENDAMENTOS
         server.createContext("/api/agendamentos", new HttpHandler() {
-
             @Override
             public void handle(HttpExchange exchange) throws IOException {
                 exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
@@ -266,7 +282,6 @@ public class ServidorWeb {
                     String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
 
                     if (body.startsWith("[")) {
-                        // Exclusão em lote
                         body = body.replace("[", "").replace("]", "").replace("\"", "");
                         String[] ids = body.split(",");
                         for (String id : ids) {
