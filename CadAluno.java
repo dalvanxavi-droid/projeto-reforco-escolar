@@ -95,7 +95,7 @@ public class CadAluno {
                     }
 
                     Aluno dadosAluno = new Aluno(nomeAluno, dataNascimento, anoAluno, responsavelAluno,
-                            nivelSelecionado, temNecessidadeEspecial, descricaoNecessidade);
+                            nivelSelecionado, temNecessidadeEspecial, descricaoNecessidade, StatusPagamento.PENDENTE);
                     ListaAlunos.add(dadosAluno);
                     GerenciadorArquivo.salvarAlunos(ListaAlunos);
                     System.out.println("✅ Aluno cadastrado com sucesso!");

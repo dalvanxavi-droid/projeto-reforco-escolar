@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto Reforço - Painel Administrativo</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f4f6f9;
+            color: #333;
+            height: 100vh;
+        }
+
+        aside {
+            width: 240px;
+            background-color: #4a7c59;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        aside h2 {
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+
+        aside nav ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        aside nav a {
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            display: block;
+            border-radius: 6px;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        aside nav a:hover,
+        aside nav a.ativo {
+            background-color: rgba(255, 255, 255, 0.25);
+            font-weight: bold;
+        }
+
+        main {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        header {
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 26px;
+            color: #2c3e50;
+        }
+
+        .tela {
+            display: none;
+        }
+
+        .tela.ativa {
+            display: block;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border-left: 5px solid #4a7c59;
+        }
+
+        .card.card-sucesso {
+            border-left-color: #2ecc71;
+        }
+
+        .card h3 {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .card p {
+            font-size: 26px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-container,
+        .table-container,
+        .chart-container,
+        .dash-widget,
+        .calendar-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .table-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .table-container h3,
+        .chart-container h3,
+        .dash-widget h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .input-busca {
+            padding: 8px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            width: 280px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #555;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .badge-necessidade {
+            background-color: #e74c3c;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: inline-block;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .badge-necessidade:hover {
+            opacity: 0.85;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 25px;
+        }
+
+        .btn-salvar {
+            background-color: #4a7c59;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-salvar:hover {
+            background-color: #3b6346;
+        }
+
+        .btn-cancelar {
+            background-color: #95a5a6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+        }
+
+        .btn-perigo {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .btn-status-aula {
+            border: none;
+            background: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 4px 10px;
+            border-radius: 4px;
+            transition: 0.2s;
+        }
+
+        .btn-status-aula:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-wrapper {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .progress-box {
+            margin-top: 15px;
+        }
+
+        .progress-bar-bg {
+            background-color: #e9ecef;
+            border-radius: 8px;
+            height: 18px;
+            width: 100%;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-bar-fill {
+            background-color: #2ecc71;
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        summary {
+            cursor: pointer;
+            font-weight: bold;
+            color: #2c3e50;
+            font-size: 16px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        summary:hover {
+            background: #e9ecef;
+        }
+
+        .fc-toolbar-title {
+            font-size: 16px !important;
+            color: #2c3e50;
+        }
+
+        .fc-button-primary {
+            background-color: #4a7c59 !important;
+            border-color: #4a7c59 !important;
+        }
+
+        .fc-event {
+            cursor: pointer;
+            padding: 2px 4px;
+            font-weight: bold;
+            white-space: normal !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 12px;
+        }
+
+        .fc-daygrid-event {
+            white-space: normal !important;
+            align-items: normal;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .modal-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 450px;
+            max-width: 90%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-card h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #4a7c59;
+            padding-bottom: 8px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .modal-calendario-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            width: 900px;
+            max-width: 95%;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-calendario-card h3 {
+            margin-bottom: 15px;
+            color: #2c3e50;
+            border-bottom: 2px solid #4a7c59;
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-calendario-body {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .dias-semana-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+
+        .dias-semana-grid label {
+            font-size: 13px;
+            font-weight: normal;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .diario-textarea {
+            width: 100%;
+            height: 180px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            resize: vertical;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside>
+        <h2>Projeto Reforço</h2>
+        <nav>
+            <ul>
+                <li><a onclick="navegar('dashboard')" id="btn-dashboard" class="ativo">🏠 Dashboard</a></li>
+                <li><a onclick="navegar('alunos')" id="btn-alunos">👨‍🎓 Alunos</a></li>
+                <li><a onclick="navegar('relatorios')" id="btn-relatorios">📊 Relatórios</a></li>
+                <li><a onclick="navegar('agenda')" id="btn-agenda">📅 Agenda</a></li>
+                <li><a onclick="navegar('financeiro')" id="btn-financeiro">💰 Financeiro</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main>
+        <header>
+            <h1 id="titulo-pagina">Dashboard Principal</h1>
+        </header>
+
+        <!-- TELA 1: DASHBOARD -->
+        <section id="tela-dashboard" class="tela ativa">
+            <div class="cards-container">
+                <div class="card">
+                    <h3>Total de Alunos</h3>
+                    <p class="dash-total-alunos">0</p>
+                </div>
+                <div class="card card-sucesso">
+                    <h3>Alfabetizados</h3>
+                    <p id="dash-total-alfabetizados">0</p>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="dash-widget">
+                    <h3>🎯 Índice de Alfabetização</h3>
+                    <p style="color: #666; font-size: 14px;">Percentual de alunos nos níveis ALFABETICA ou ORTOGRAFICA.
+                    </p>
+                    <div class="progress-box">
+                        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 14px;">
+                            <span>Progresso Atual</span>
+                            <span id="dash-porcentagem-alfabetica">0%</span>
+                        </div>
+                        <div class="progress-bar-bg">
+                            <div id="dash-bar-fill" class="progress-bar-fill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-widget">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">📅 Planner de Agendamentos</h3>
+                        <button type="button" class="btn-salvar" style="padding: 6px 12px; font-size: 12px;"
+                            onclick="abrirCalendarioGrande()">🔍 Expandir</button>
+                    </div>
+                    <p style="color: #666; font-size: 13px; margin-bottom: 10px;">Visualização rápida do mês atual.</p>
+                    <div id="calendar-dash" style="max-height: 220px; overflow: hidden;"></div>
+                </div>
+
+                <div class="dash-widget">
+                    <details>
+                        <summary>📓 Diário de Anotações Rápidas</summary>
+                        <textarea id="diarioAnotacoes" class="diario-textarea"
+                            placeholder="Escreva suas anotações, recados ou lembretes do dia aqui..."
+                            oninput="salvarDiario()"></textarea>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- TELA 2: ALUNOS -->
+        <section id="tela-alunos" class="tela">
+            <div class="form-container">
+                <h3 id="form-titulo">Novo Cadastro de Aluno</h3>
+                <form id="formAluno">
+                    <input type="hidden" id="matriculaEditando" value="">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Nome Completo do Aluno:</label>
+                            <input type="text" id="nome" required placeholder="Ex: Lucas Silva">
+                        </div>
+                        <div class="form-group">
+                            <label>Data de Nascimento:</label>
+                            <input type="date" id="dataNascimento" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Ano Escolar:</label>
+                            <input type="text" id="anoEscolar" required placeholder="Ex: 3º Ano">
+                        </div>
+                        <div class="form-group">
+                            <label>Nível de Leitura:</label>
+                            <select id="nivelLeitura" required>
+                                <option value="GARATUJA">GARATUJA</option>
+                                <option value="PRE_SILABICA">PRE_SILABICA</option>
+                                <option value="SILABICA_SEM_VALOR_SONORO">SILABICA_SEM_VALOR_SONORO</option>
+                                <option value="SILABICA_COM_VALOR_SONORO">SILABICA_COM_VALOR_SONORO</option>
+                                <option value="SILABICO_ALFABETICA">SILABICO_ALFABETICA</option>
+                                <option value="ALFABETICA">ALFABETICA</option>
+                                <option value="ORTOGRAFICA">ORTOGRAFICA</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Nome do Responsável:</label>
+                            <input type="text" id="nomeResponsavel" required placeholder="Ex: Maria Silva">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefone do Responsável:</label>
+                            <input type="text" id="telefoneResponsavel" required placeholder="Ex: 84999998888">
+                        </div>
+                        <div class="form-group">
+                            <label>Endereço do Responsável:</label>
+                            <input type="text" id="enderecoResponsavel" required placeholder="Ex: Rua das Flores, 123">
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="temNecessidadeEspecial" onchange="toggleNecessidadeDesc()">
+                            <label for="temNecessidadeEspecial">NEE?</label>
+                        </div>
+                        <div class="form-group" id="grupoDescricaoNecessidade" style="display: none;">
+                            <label>Qual a Necessidade Especial?</label>
+                            <input type="text" id="descricaoNecessidade" placeholder="Ex: Dislexia, TDAH...">
+                        </div>
+                    </div>
+                    <button type="submit" id="btnSubmit" class="btn-salvar">Cadastrar Aluno</button>
+                    <button type="button" id="btnCancelar" onclick="limparFormulario()" class="btn-cancelar">Cancelar
+                        Edição</button>
+                </form>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header-flex">
+                    <h3>Listagem de Alunos Ativos</h3>
+                    <input type="text" id="inputBusca" class="input-busca" onkeyup="filtrarAlunos()"
+                        placeholder="🔍 Buscar por nome ou matrícula...">
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Matrícula</th>
+                            <th>Nome do Aluno</th>
+                            <th>Ano Escolar</th>
+                            <th>Nível de Leitura</th>
+                            <th>Responsável (Endereço)</th>
+                            <th>NEE</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-alunos-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TELA 3: RELATÓRIOS -->
+        <section id="tela-relatorios" class="tela">
+            <div class="cards-container">
+                <div class="card">
+                    <h3>Total de Alunos</h3>
+                    <p class="dash-total-alunos">0</p>
+                </div>
+                <div class="card card-sucesso">
+                    <h3>Alfabetizados</h3>
+                    <p id="relatorio-total-alfabetizados">0</p>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 20px;">
+                <div class="chart-container" style="flex: 1;">
+                    <h3 style="text-align: center;">Distribuição por Nível de Leitura</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="graficoPizza"></canvas>
+                    </div>
+                </div>
+
+                <div class="table-container" style="flex: 2;">
+                    <h3>Relatório Geral dos Alunos</h3>
+                    <table id="tabela-relatorio-geral">
+                        <thead>
+                            <tr>
+                                <th>Matrícula</th>
+                                <th>Aluno</th>
+                                <th>Nível</th>
+                                <th>Responsável</th>
+                                <th>Contato / Endereço</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TELA 4: AGENDA INTERATIVA -->
+        <section id="tela-agenda" class="tela">
+            <div class="calendar-container">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>📅 Agenda de Aulas Interativa</h3>
+                    <button class="btn-salvar" type="button" onclick="abrirModalPacote()">➕ Pacote Mensal de
+                        Aulas</button>
+                </div>
+                <p style="color: #666; font-size: 13px; margin-bottom: 15px;">💡 Clique em qualquer horário para
+                    agendar. Clique em uma aula para editar/excluir.</p>
+                <div id="calendar-agenda"></div>
+            </div>
+
+            <div class="table-container">
+                <div class="table-header-flex">
+                    <h3>Relatório/Listagem de Agendamentos</h3>
+                    <button class="btn-perigo" type="button" onclick="excluirSelecionados()">🗑️ Excluir
+                        Selecionados</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 40px; text-align: center;">
+                                <input type="checkbox" id="chk-selecionar-todos"
+                                    onchange="selecionarTodosAgendamentos(this)">
+                            </th>
+                            <th>Matrícula Aluno</th>
+                            <th>Data</th>
+                            <th>Hora</th>
+                            <th style="text-align: center;">Status</th>
+                            <th>Observação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-agendamentos"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- TELA 5: FINANCEIRO -->
+        <section id="tela-financeiro" class="tela">
+            <div class="cards-container">
+                <div class="card">
+                    <h3>Total Recebido</h3>
+                    <p id="financeiro-total-recebido">R$ 0,00</p>
+                </div>
+                <div class="card card-sucesso">
+                    <h3>Total Pendente</h3>
+                    <p id="financeiro-total-pendente">R$ 0,00</p>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h3>Controle Financeiro</h3>
+                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Aqui você acompanhará os pagamentos e
+                    mensalidades.</p>
+                <div id="conteudo-financeiro">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Matrícula</th>
+                                <th>Nome do Aluno</th>
+                                <th>Ano Escolar</th>
+                                <th>Status de Pagamento</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-financeiro-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL PARA CALENDÁRIO GRANDE -->
+    <div id="modalCalendarioGrande" class="modal-overlay">
+        <div class="modal-calendario-card">
+            <h3>
+                <span>📅 Planner de Agendamentos (Ampliado)</span>
+                <button type="button" class="btn-perigo" style="padding: 4px 10px; font-size: 14px;"
+                    onclick="fecharCalendarioGrande()">✖ Fechar</button>
+            </h3>
+            <div class="modal-calendario-body">
+                <div id="calendar-grande" style="height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CUSTOMIZADO PARA NOVO AGENDAMENTO -->
+    <div id="modalAgendamento" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Agendar Aula</h3>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Selecione o Aluno:</label>
+                <select id="modal-select-aluno"></select>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Data:</label>
+                <input type="date" id="modal-data">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Horário:</label>
+                <input type="time" id="modal-hora">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Observação:</label>
+                <input type="text" id="modal-obs" placeholder="Ex: Reforço de Matemática">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancelar" style="display:inline-block;"
+                    onclick="fecharModais()">Cancelar</button>
+                <button type="button" class="btn-salvar" onclick="salvarModalAgendamento()">Confirmar
+                    Agendamento</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL CUSTOMIZADO PARA PACOTE MENSAL -->
+    <div id="modalPacote" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Agendar Pacote Recorrente</h3>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Aluno:</label>
+                <select id="pacote-select-aluno"></select>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Quantidade Total de Aulas:</label>
+                <input type="number" id="pacote-qtd" value="20" min="1">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Data de Início:</label>
+                <input type="date" id="pacote-data-inicio">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Dias da Semana Desejados:</label>
+                <div class="dias-semana-grid">
+                    <label><input type="checkbox" class="chk-dia" value="1"> Segunda-feira</label>
+                    <label><input type="checkbox" class="chk-dia" value="2"> Terça-feira</label>
+                    <label><input type="checkbox" class="chk-dia" value="3"> Quarta-feira</label>
+                    <label><input type="checkbox" class="chk-dia" value="4"> Quinta-feira</label>
+                    <label><input type="checkbox" class="chk-dia" value="5"> Sexta-feira</label>
+                    <label><input type="checkbox" class="chk-dia" value="6"> Sábado</label>
+                </div>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Horário das Aulas:</label>
+                <input type="time" id="pacote-hora" value="14:00">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Observação:</label>
+                <input type="text" id="pacote-obs" value="Pacote Mensal">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancelar" style="display:inline-block;"
+                    onclick="fecharModais()">Cancelar</button>
+                <button type="button" class="btn-salvar" onclick="salvarPacoteMensal()">Gerar Aulas</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA GERENCIAR/EXCLUIR AULA -->
+    <div id="modalDetalheAula" class="modal-overlay">
+        <div class="modal-card">
+            <h3>Gerenciar Agendamento</h3>
+            <input type="hidden" id="detalhe-id">
+            <p style="margin-bottom: 15px;" id="detalhe-info-aluno">--</p>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Reagendar Data:</label>
+                <input type="date" id="detalhe-data">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Reagendar Horário:</label>
+                <input type="time" id="detalhe-hora">
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-perigo" onclick="excluirAulaModal()">🗑️ Excluir Aula</button>
+                <button type="button" class="btn-cancelar" style="display:inline-block;"
+                    onclick="fecharModais()">Sair</button>
+                <button type="button" class="btn-salvar" onclick="salvarReagendamentoModal()">Salvar Alteração</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let meuGraficoPizza = null;
+        let calendarDash = null;
+        let calendarGrande = null;
+        let calendarAgenda = null;
+        let alunosCache = [];
+        let alunosMap = {};
+        let agendamentosCache = [];
+        let telaAtual = 'dashboard';
+        let ultimosEventosCache = [];
+
+       function navegar(tela) {
+            telaAtual = tela;
+            document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
+            document.querySelectorAll('aside nav a').forEach(b => b.classList.remove('ativo'));
+
+            document.getElementById(`tela-${tela}`).classList.add('ativa');
+            document.getElementById(`btn-${tela}`).classList.add('ativo');
+
+            const titulos = {
+                'dashboard': 'Dashboard Principal',
+                'alunos': 'Gestão de Alunos',
+                'relatorios': 'Relatórios Acadêmicos',
+                'agenda': 'Agenda de Reforço',
+                'financeiro': 'Setor Financeiro'
+            };
+            document.getElementById('titulo-pagina').innerText = titulos[tela];
+
+            if (tela === 'agenda' && calendarAgenda) {
+                setTimeout(() => calendarAgenda.render(), 100);
+            }
+            if (tela === 'dashboard' && calendarDash) {
+                setTimeout(() => calendarDash.render(), 100);
+            }
+            if (tela === 'financeiro') {
+                carregarFinanceiro();
+            }
+            if (tela === 'alunos') {
+                carregarAlunos();
+            }
+        }
+
+        function toggleNecessidadeDesc() {
+            const chk = document.getElementById('temNecessidadeEspecial');
+            const grupoDesc = document.getElementById('grupoDescricaoNecessidade');
+            if (chk.checked) {
+                grupoDesc.style.display = 'flex';
+            } else {
+                grupoDesc.style.display = 'none';
+                document.getElementById('descricaoNecessidade').value = '';
+            }
+        }
+
+        function salvarDiario() {
+            const texto = document.getElementById('diarioAnotacoes').value;
+            localStorage.setItem('projeto_reforco_diario', texto);
+        }
+
+        function carregarDiario() {
+            const salvo = localStorage.getItem('projeto_reforco_diario');
+            if (salvo) {
+                document.getElementById('diarioAnotacoes').value = salvo;
+            }
+        }
+
+        function abrirCalendarioGrande() {
+            document.getElementById('modalCalendarioGrande').style.display = 'flex';
+            if (calendarGrande) {
+                calendarGrande.destroy();
+            }
+            const el = document.getElementById('calendar-grande');
+            calendarGrande = new FullCalendar.Calendar(el, {
+                initialView: 'dayGridMonth',
+                locale: 'pt-br',
+                displayEventTime: false,
+                headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
+                buttonText: { today: 'Hoje', month: 'Mês', week: 'Semana' },
+                events: ultimosEventosCache,
+                eventContent: function (arg) {
+                    const ag = agendamentosCache.find(a => a.id === arg.event.id);
+                    const icone = (ag && ag.pago) ? '✅' : '❌';
+                    let container = document.createElement('div');
+                    container.innerHTML = `<span style="cursor:pointer;" title="Clique para alternar status da aula" onclick="alternarStatusDoDashboard('${arg.event.id}')">${icone} ${arg.event.title}</span>`;
+                    return { domNodes: [container] };
+                }
+            });
+            calendarGrande.render();
+        }
+
+        function fecharCalendarioGrande() {
+            document.getElementById('modalCalendarioGrande').style.display = 'none';
+        }
+
+        function alternarNEE(matricula) {
+            const aluno = alunosCache.find(a => a.matricula === matricula);
+            const descricao = aluno ? (aluno.descricaoNecessidade || '') : '';
+            const textoFinal = (descricao.trim() !== '' && descricao !== 'null' && descricao !== 'undefined') ? descricao : 'Não informada';
+            alert("Necessidade Especial (NEE): " + textoFinal);
+        }
+
+        async function carregarAlunos() {
+            try {
+                const resposta = await fetch('/api/alunos');
+                alunosCache = await resposta.json();
+
+                renderizarTabelaAlunos(alunosCache);
+                atualizarSelectsModal();
+
+                const relatorioGeralBody = document.querySelector('#tabela-relatorio-geral tbody');
+                relatorioGeralBody.innerHTML = '';
+
+                document.querySelectorAll('.dash-total-alunos').forEach(el => el.innerText = alunosCache.length);
+
+                let alfabetizadosCount = 0;
+
+                const niveis = {
+                    'GARATUJA': 0,
+                    'PRE_SILABICA': 0,
+                    'SILABICA_SEM_VALOR_SONORO': 0,
+                    'SILABICA_COM_VALOR_SONORO': 0,
+                    'SILABICO_ALFABETICA': 0,
+                    'ALFABETICA': 0,
+                    'ORTOGRAFICA': 0
+                };
+
+                alunosCache.forEach(aluno => {
+                    alunosMap[aluno.matricula] = aluno.nome;
+
+                    if (aluno.nivelLeitura === 'ORTOGRAFICA' || aluno.nivelLeitura === 'ALFABETICA') {
+                        alfabetizadosCount++;
+                    }
+
+                    if (niveis[aluno.nivelLeitura] !== undefined) niveis[aluno.nivelLeitura]++;
+
+                    const respNome = aluno.responsavelNome || aluno.nomeResponsavel || 'Não Cadastrado';
+                    const respFone = aluno.responsavelTelefone || aluno.telefoneResponsavel || '--';
+                    const respEnd = aluno.responsavelEndereco || aluno.enderecoResponsavel || '--';
+
+                    const linhaRelatorio = document.createElement('tr');
+                    linhaRelatorio.innerHTML = `
+                        <td>${aluno.matricula}</td>
+                        <td>${aluno.nome}</td>
+                        <td>${aluno.nivelLeitura}</td>
+                        <td>${respNome}</td>
+                        <td>${respFone} <br><small style="color:#666;">${respEnd}</small></td>
+                    `;
+                    relatorioGeralBody.appendChild(linhaRelatorio);
+                });
+
+                document.getElementById('dash-total-alfabetizados').innerText = alfabetizadosCount;
+                document.getElementById('relatorio-total-alfabetizados').innerText = alfabetizadosCount;
+
+                const porcentagemAlfabetica = alunosCache.length > 0 ? ((alfabetizadosCount / alunosCache.length) * 100).toFixed(1) : 0;
+                document.getElementById('dash-porcentagem-alfabetica').innerText = `${porcentagemAlfabetica}%`;
+                document.getElementById('dash-bar-fill').style.width = `${porcentagemAlfabetica}%`;
+
+                renderizarGraficoPizza(niveis);
+
+            } catch (erro) {
+                console.error("Erro ao carregar alunos:", erro);
+            }
+        }
+
+        function atualizarSelectsModal() {
+            const modalSelect = document.getElementById('modal-select-aluno');
+            const pacoteSelect = document.getElementById('pacote-select-aluno');
+
+            modalSelect.innerHTML = '<option value="">Selecione...</option>';
+            pacoteSelect.innerHTML = '<option value="">Selecione...</option>';
+
+            alunosCache.forEach(a => {
+                modalSelect.innerHTML += `<option value="${a.matricula}">${a.nome}</option>`;
+                pacoteSelect.innerHTML += `<option value="${a.matricula}">${a.nome}</option>`;
+            });
+        }
+
+        function renderizarTabelaAlunos(lista) {
+            const tabelaBody = document.getElementById('tabela-alunos-body');
+            tabelaBody.innerHTML = '';
+
+            lista.forEach(aluno => {
+                const respNome = aluno.responsavelNome || aluno.nomeResponsavel || 'Não Cadastrado';
+                const respFone = aluno.responsavelTelefone || aluno.telefoneResponsavel || '--';
+                const respEnd = aluno.responsavelEndereco || aluno.enderecoResponsavel || 'Não informado';
+
+                const temNee = aluno.temNecessidadeEspecial !== undefined ? aluno.temNecessidadeEspecial : aluno.temNecessidade;
+
+                const linha = document.createElement('tr');
+                linha.innerHTML = `
+                    <td>${aluno.matricula}</td>
+                    <td>${aluno.nome}</td>
+                    <td>${aluno.anoEscolar}</td>
+                    <td>${aluno.nivelLeitura}</td>
+                    <td>${respNome} (${respFone})<br><small style="color:#666;">📍 ${respEnd}</small></td>
+                    <td>${temNee ? `<span class="badge-necessidade" onclick="alternarNEE('${aluno.matricula}')" title="Clique para ver a necessidade">Sim</span>` : '--'}</td>
+                    <td>
+                        <button onclick="prepararEdicao('${aluno.matricula}')" style="background:none; border:none; cursor:pointer; font-size:16px;" title="Editar">✏️</button>
+                        <button onclick="removerAluno('${aluno.matricula}', '${aluno.nome}')" style="background:none; border:none; cursor:pointer; font-size:16px;" title="Remover">🗑️</button>
+                    </td>
+                `;
+                tabelaBody.appendChild(linha);
+            });
+        }
+
+        function filtrarAlunos() {
+            const termo = document.getElementById('inputBusca').value.toLowerCase();
+            const alunosFiltrados = alunosCache.filter(aluno =>
+                aluno.nome.toLowerCase().includes(termo) ||
+                aluno.matricula.toLowerCase().includes(termo)
+            );
+            renderizarTabelaAlunos(alunosFiltrados);
+        }
+
+        function prepararEdicao(matricula) {
+            const aluno = alunosCache.find(a => a.matricula === matricula);
+            if (!aluno) return;
+
+            document.getElementById('matriculaEditando').value = aluno.matricula;
+            document.getElementById('nome').value = aluno.nome;
+            document.getElementById('dataNascimento').value = aluno.dataNascimento || '';
+            document.getElementById('anoEscolar').value = aluno.anoEscolar;
+            document.getElementById('nivelLeitura').value = aluno.nivelLeitura;
+
+            document.getElementById('nomeResponsavel').value = aluno.responsavelNome || aluno.nomeResponsavel || '';
+            document.getElementById('telefoneResponsavel').value = aluno.telefoneResponsavel || aluno.responsavelTelefone || '';
+            document.getElementById('enderecoResponsavel').value = aluno.responsavelEndereco || aluno.responsavelEndereco || '';
+
+            const temNee = aluno.temNecessidadeEspecial !== undefined ? aluno.temNecessidadeEspecial : aluno.temNecessidade;
+            document.getElementById('temNecessidadeEspecial').checked = temNee;
+            document.getElementById('descricaoNecessidade').value = aluno.descricaoNecessidade || '';
+
+            toggleNecessidadeDesc();
+
+            document.getElementById('form-titulo').innerText = 'Editar Aluno';
+            document.getElementById('btnSubmit').innerText = 'Salvar Alterações';
+            document.getElementById('btnCancelar').style.display = 'inline-block';
+
+            navegar('alunos');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function limparFormulario() {
+            document.getElementById('formAluno').reset();
+            document.getElementById('matriculaEditando').value = '';
+            document.getElementById('form-titulo').innerText = 'Novo Cadastro de Aluno';
+            document.getElementById('btnSubmit').innerText = 'Cadastrar Aluno';
+            document.getElementById('btnCancelar').style.display = 'none';
+            toggleNecessidadeDesc();
+        }
+
+        function renderizarGraficoPizza(niveis) {
+            const ctx = document.getElementById('graficoPizza').getContext('2d');
+            if (meuGraficoPizza) meuGraficoPizza.destroy();
+
+            meuGraficoPizza = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(niveis),
+                    datasets: [{
+                        data: Object.values(niveis),
+                        backgroundColor: ['#e74c3c', '#e67e22', '#f1c40f', '#3498db', '#9b59b6', '#2ecc71', '#1abc9c']
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        async function removerAluno(matricula, nome) {
+            if (confirm(`Tem certeza que deseja remover o aluno ${nome}?`)) {
+                await fetch('/api/alunos', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ matricula: matricula })
+                });
+                await carregarAlunos();
+            }
+        }
+
+        document.getElementById('formAluno').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const matricula = document.getElementById('matriculaEditando').value;
+            const ehEdicao = matricula !== '';
+
+            const nomeResp = document.getElementById('nomeResponsavel').value;
+            const foneResp = document.getElementById('telefoneResponsavel').value;
+            const endResp = document.getElementById('enderecoResponsavel').value;
+            const descNee = document.getElementById('descricaoNecessidade').value;
+            const temNee = document.getElementById('temNecessidadeEspecial').checked;
+
+            const dadosAluno = {
+                matricula: matricula,
+                nome: document.getElementById('nome').value,
+                dataNascimento: document.getElementById('dataNascimento').value,
+                anoEscolar: document.getElementById('anoEscolar').value,
+                nivelLeitura: document.getElementById('nivelLeitura').value,
+                nomeResponsavel: nomeResp,
+                responsavelNome: nomeResp,
+                telefoneResponsavel: foneResp,
+                responsavelTelefone: foneResp,
+                enderecoResponsavel: endResp,
+                responsavelEndereco: endResp,
+                temNecessidadeEspecial: temNee,
+                descricaoNecessidade: descNee
+            };
+
+            await fetch('/api/alunos', {
+                method: ehEdicao ? 'PUT' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dadosAluno)
+            });
+
+            limparFormulario();
+            await carregarAlunos();
+            navegar('alunos');
+        });
+
+        async function carregarTabelaEAgenda() {
+            try {
+                const res = await fetch("/api/agendamentos");
+                agendamentosCache = await res.json();
+                const tbody = document.getElementById("tabela-agendamentos");
+                if (tbody) tbody.innerHTML = "";
+
+                const eventosCalendario = [];
+
+                agendamentosCache.forEach(a => {
+                    let dataFormatada = a.data;
+                    if (a.data && a.data.includes("-")) {
+                        const partes = a.data.split("-");
+                        dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                    }
+
+                    const nomeAluno = alunosMap[a.matriculaAluno] || 'Aluno';
+                    const textoStatus = a.pago ? 'PAGO' : 'PENDENTE';
+                    const corStatus = a.pago ? '#27ae60' : '#c0392b';
+                    const tituloStatus = a.pago ? 'Pago (Clique para alterar)' : 'Pendente (Clique para alterar)';
+
+                    if (tbody) {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td style="text-align: center;">
+                                    <input type="checkbox" class="chk-item-agenda" value="${a.id}">
+                                </td>
+                                <td>${nomeAluno}</td>
+                                <td>${dataFormatada}</td>
+                                <td>${a.hora}</td>
+                                <td style="text-align: center;">
+                                    <button type="button" class="btn-status-aula" style="color: white; background-color: ${corStatus};" onclick="alternarStatusAula('${a.id}')" title="${tituloStatus}">${textoStatus}</button>
+                                </td>
+                                <td>${a.observacao}</td>
+                                <td>
+                                    <button onclick="abrirModalDetalhe('${a.id}')" style="background:none; border:none; cursor:pointer;" title="Gerenciar">⚙️</button>
+                                </td>
+                            </tr>
+                        `;
+                    }
+
+                    eventosCalendario.push({
+                        id: a.id,
+                        title: `${a.hora} ${nomeAluno}`,
+                        start: `${a.data}T${a.hora}:00`,
+                        backgroundColor: '#4a7c59'
+                    });
+                });
+
+                ultimosEventosCache = eventosCalendario;
+
+                const chkTodos = document.getElementById('chk-selecionar-todos');
+                if (chkTodos) chkTodos.checked = false;
+
+                inicializarCalendarios(eventosCalendario);
+
+            } catch (err) {
+                console.error("Erro ao carregar agendamentos:", err);
+            }
+        }
+
+        async function alternarStatusAula(id) {
+            const ag = agendamentosCache.find(a => a.id === id);
+            if (!ag) return;
+
+            const novoStatus = !ag.pago;
+
+            await fetch("/api/agendamentos", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    id: ag.id,
+                    data: ag.data,
+                    hora: ag.hora,
+                    pago: novoStatus,
+                    observacao: ag.observacao || "",
+                    matriculaAluno: ag.matriculaAluno
+                })
+            });
+
+            await carregarTabelaEAgenda();
+            if (calendarGrande && document.getElementById('modalCalendarioGrande').style.display === 'flex') {
+                abrirCalendarioGrande();
+            }
+        }
+
+        async function alternarStatusDoDashboard(id) {
+            await alternarStatusAula(id);
+        }
+
+        function selecionarTodosAgendamentos(masterChk) {
+            document.querySelectorAll('.chk-item-agenda').forEach(chk => {
+                chk.checked = masterChk.checked;
+            });
+        }
+
+        async function excluirSelecionados() {
+            const selecionados = Array.from(document.querySelectorAll('.chk-item-agenda:checked')).map(cb => cb.value);
+
+            if (selecionados.length === 0) {
+                alert("Selecione ao menos um agendamento marcando a caixinha na tabela.");
+                return;
+            }
+
+            if (confirm(`Tem certeza que deseja excluir os ${selecionados.length} agendamentos selecionados?`)) {
+                await fetch("/api/agendamentos", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(selecionados)
+                });
+                await carregarTabelaEAgenda();
+                navegar('agenda');
+            }
+        }
+
+        function inicializarCalendarios(eventos) {
+            const calendarElDash = document.getElementById('calendar-dash');
+            if (calendarElDash) {
+                if (calendarDash) calendarDash.destroy();
+                calendarDash = new FullCalendar.Calendar(calendarElDash, {
+                    initialView: 'dayGridMonth',
+                    locale: 'pt-br',
+                    displayEventTime: false,
+                    allDayText: 'Dia Inteiro',
+                    headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth' },
+                    buttonText: { today: 'Hoje', month: 'Mês' },
+                    events: eventos,
+
+                    eventContent: function (arg) {
+                        const ag = agendamentosCache.find(a => a.id === arg.event.id);
+                        const icone = (ag && ag.pago) ? '✅' : '❌';
+
+                        let container = document.createElement('div');
+                        container.innerHTML = `<span style="cursor:pointer;" title="Clique para alternar status da aula" onclick="alternarStatusDoDashboard('${arg.event.id}')">${icone} ${arg.event.title}</span>`;
+                        return { domNodes: [container] };
+                    }
+                });
+                calendarDash.render();
+            }
+
+            const calendarElAgenda = document.getElementById('calendar-agenda');
+            if (calendarElAgenda) {
+                if (calendarAgenda) calendarAgenda.destroy();
+                calendarAgenda = new FullCalendar.Calendar(calendarElAgenda, {
+                    initialView: 'timeGridWeek',
+                    locale: 'pt-br',
+                    displayEventTime: false,
+                    editable: true,
+                    selectable: true,
+                    allDayText: 'Dia Inteiro',
+                    slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+                    headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay' },
+                    buttonText: { today: 'Hoje', month: 'Mês', week: 'Semana', day: 'Dia' },
+                    events: eventos,
+
+                    select: function (info) {
+                        abrirModalNovo(info.startStr);
+                    },
+
+                    eventClick: function (info) {
+                        abrirModalDetalhe(info.event.id);
+                    },
+
+                    eventDrop: async function (info) {
+                        const id = info.event.id;
+                        const novaDataStr = info.event.start.toISOString().split('T')[0];
+                        const novaHoraStr = info.event.start.toTimeString().substring(0, 5);
+
+                        const resp = await fetch("/api/agendamentos", {
+                            method: "PUT",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ id: id, data: novaDataStr, hora: novaHoraStr })
+                        });
+
+                        if (resp.status === 409) {
+                            alert("⚠️ Conflito de horário! Já existe um aluno agendado neste mesmo dia e horário.");
+                            info.revert();
+                        } else {
+                            await carregarTabelaEAgenda();
+                            navegar('agenda');
+                        }
+                    }
+                });
+                calendarAgenda.render();
+            }
+        }
+
+        function fecharModais() {
+            document.querySelectorAll('.modal-overlay').forEach(m => {
+                if (m.id !== 'modalCalendarioGrande') m.style.display = 'none';
+            });
+        }
+
+        function abrirModalNovo(startIso) {
+            const dataPadrao = startIso.split('T')[0];
+            const horaPadrao = startIso.includes('T') ? startIso.split('T')[1].substring(0, 5) : '14:00';
+
+            document.getElementById('modal-data').value = dataPadrao;
+            document.getElementById('modal-hora').value = horaPadrao;
+            document.getElementById('modal-obs').value = '';
+            document.getElementById('modalAgendamento').style.display = 'flex';
+        }
+
+        async function salvarModalAgendamento() {
+            const mat = document.getElementById('modal-select-aluno').value;
+            const data = document.getElementById('modal-data').value;
+            const hora = document.getElementById('modal-hora').value;
+            const obs = document.getElementById('modal-obs').value;
+
+            if (!mat || !data || !hora) {
+                alert("Preencha o aluno, data e hora.");
+                return;
+            }
+
+            const resp = await fetch("/api/agendamentos", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ matriculaAluno: mat, data: data, hora: hora, observacao: obs })
+            });
+
+            if (resp.status === 409) {
+                alert("⚠️ Conflito! Já existe um aluno agendado neste mesmo horário.");
+            } else {
+                fecharModais();
+                await carregarTabelaEAgenda();
+                navegar(telaAtual);
+                if (document.getElementById('modalCalendarioGrande').style.display === 'flex') {
+                    abrirCalendarioGrande();
+                }
+            }
+        }
+
+        function abrirModalPacote() {
+            document.getElementById('pacote-data-inicio').value = new Date().toISOString().split('T')[0];
+            document.querySelectorAll('.chk-dia').forEach(chk => chk.checked = false);
+            document.getElementById('modalPacote').style.display = 'flex';
+        }
+
+        async function salvarPacoteMensal() {
+            const mat = document.getElementById('pacote-select-aluno').value;
+            const qtd = parseInt(document.getElementById('pacote-qtd').value);
+            const dataInicio = document.getElementById('pacote-data-inicio').value;
+            const hora = document.getElementById('pacote-hora').value;
+            const obs = document.getElementById('pacote-obs').value;
+
+            const diasSelecionados = Array.from(document.querySelectorAll('.chk-dia:checked')).map(cb => parseInt(cb.value));
+
+            if (!mat || !qtd || !dataInicio || !hora || diasSelecionados.length === 0) {
+                alert("Preencha todos os campos e selecione pelo menos um dia da semana.");
+                return;
+            }
+
+            let dataAtual = new Date(dataInicio + 'T00:00:00');
+            const listaAgendamentos = [];
+
+            while (listaAgendamentos.length < qtd) {
+                if (diasSelecionados.includes(dataAtual.getDay())) {
+                    const isoData = dataAtual.toISOString().split('T')[0];
+                    listaAgendamentos.push({
+                        matriculaAluno: mat,
+                        data: isoData,
+                        hora: hora,
+                        observacao: `${obs} (Aula ${listaAgendamentos.length + 1}/${qtd})`
+                    });
+                }
+                dataAtual.setDate(dataAtual.getDate() + 1);
+            }
+
+            await fetch("/api/agendamentos", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(listaAgendamentos)
+            });
+
+            fecharModais();
+            await carregarTabelaEAgenda();
+            navegar(telaAtual);
+            if (document.getElementById('modalCalendarioGrande').style.display === 'flex') {
+                abrirCalendarioGrande();
+            }
+        }
+
+        function abrirModalDetalhe(id) {
+            const ag = agendamentosCache.find(a => a.id === id);
+            if (!ag) return;
+
+            document.getElementById('detalhe-id').value = ag.id;
+            document.getElementById('detalhe-info-aluno').innerText = `Aluno: ${alunosMap[ag.matriculaAluno] || ag.matriculaAluno}`;
+            document.getElementById('detalhe-data').value = ag.data;
+            document.getElementById('detalhe-hora').value = ag.hora;
+
+            document.getElementById('modalDetalheAula').style.display = 'flex';
+        }
+
+        async function salvarReagendamentoModal() {
+            const id = document.getElementById('detalhe-id').value;
+            const novaData = document.getElementById('detalhe-data').value;
+            const novaHora = document.getElementById('detalhe-hora').value;
+
+            const resp = await fetch("/api/agendamentos", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ id: id, data: novaData, hora: novaHora })
+            });
+
+            if (resp.status === 409) {
+                alert("⚠️ Conflito! Já existe aula agendada neste horário.");
+            } else {
+                fecharModais();
+                await carregarTabelaEAgenda();
+                navegar(telaAtual);
+                if (document.getElementById('modalCalendarioGrande').style.display === 'flex') {
+                    abrirCalendarioGrande();
+                }
+            }
+        }
+
+        async function excluirAulaModal() {
+            const id = document.getElementById('detalhe-id').value;
+            if (confirm("Deseja realmente remover este agendamento?")) {
+                await fetch(`/api/agendamentos?id=${id}`, {
+                    method: "DELETE"
+                });
+                fecharModais();
+                await carregarTabelaEAgenda();
+                navegar(telaAtual);
+                if (document.getElementById('modalCalendarioGrande').style.display === 'flex') {
+                    abrirCalendarioGrande();
+                }
+            }
+        }
+
+        function carregarFinanceiro() {
+            fetch('/api/alunos')
+                .then(response => response.json())
+                .then(alunos => {
+                    const tbody = document.getElementById('tabela-financeiro-body');
+                    tbody.innerHTML = '';
+
+                    let totalRecebido = 0;
+                    let totalPendente = 0;
+
+                    alunos.forEach(aluno => {
+                        const status = aluno.statusPagamento || 'PENDENTE';
+                        
+                        if (status === 'EM_DIA') {
+                            totalRecebido += 150.0;
+                        } else {
+                            totalPendente += 150.0;
+                        }
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${aluno.matricula}</td>
+                            <td>${aluno.nome}</td>
+                            <td>${aluno.anoEscolar}</td>
+                            <td>${aluno.statusPagamentoDesc || 'Pendente'}</td>
+                            <td>
+                                <button onclick="mudarStatus('${aluno.matricula}', 'EM_DIA')">✅ Em dia</button>
+                                <button onclick="mudarStatus('${aluno.matricula}', 'PENDENTE')">⏳ Pendente</button>
+                                <button onclick="mudarStatus('${aluno.matricula}', 'ATRASADO')">❌ Atrasado</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+
+                    document.getElementById('financeiro-total-recebido').innerText = `R$ ${totalRecebido.toFixed(2).replace('.', ',')}`;
+                    document.getElementById('financeiro-total-pendente').innerText = `R$ ${totalPendente.toFixed(2).replace('.', ',')}`;
+                })
+                .catch(error => console.error('Erro ao carregar financeiro:', error));
+        }
+
+        function mudarStatus(matricula, novoStatus) {
+            fetch(`/api/alunos/status?matricula=${matricula}&status=${novoStatus}`, {
+                method: 'PUT'
+            })
+            .then(response => {
+                if (response.ok) {
+                    carregarFinanceiro();
+                } else {
+                    alert('Erro ao atualizar o status.');
+                }
+            })
+            .catch(error => console.error('Erro:', error));
+        }
+
+        // Execução inicial ao abrir a página
+        carregarAlunos();
+        carregarTabelaEAgenda();
+        carregarDiario();
+        carregarFinanceiro();
+    </script>
+</body>
+
+</html>

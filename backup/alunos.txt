@@ -1,0 +1,4 @@
+12052019001;Benicio Marques;12/05/2019;2o Ano;ALFABETICA;false;;Naiara Medeiros ;84 9 9999-9955;Não informado
+17032022002;Maria Isabela;17/03/2022;Nivel IV;SILABICA_COM_VALOR_SONORO;false;;Naiara Medeiros;84 9 9888-4567;COOPAB, Cond Parque Morumbi, 2000
+25052019003;Maria Liv;25/05/2019;1o Ano;SILABICA_COM_VALOR_SONORO;true;TEA;Paoulla Maues;84 9 9233-4455;Av Abel Cabral, Recanto das Palmeiras, 1400
+02052017004;Maria Isabel;02/05/2017;4o Ano;ALFABETICA;false;;Julio Silva;84 9 9122 3355;Rua dos Tororós, 730, Sport Garden
