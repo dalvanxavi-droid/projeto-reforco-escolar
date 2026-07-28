@@ -9,16 +9,18 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <style>
         :root {
-            --cor-primaria: #285e43;      /* Verde folha profundo */
-            --cor-primaria-hover: #347a57; 
-            --cor-secundaria: #e4efe6;    
-            --cor-destaque: #d4a373;      
-            --cor-solar: #ffb703;         
-            --fundo-pagina: #eaf3ec;      /* Verde pastel suave */
-            --texto-principal: #2d3732;   
-            --texto-secundario: #58685f;  
+            --cor-primaria: #285e43;
+            /* Verde folha profundo */
+            --cor-primaria-hover: #347a57;
+            --cor-secundaria: #e4efe6;
+            --cor-destaque: #d4a373;
+            --cor-solar: #ffb703;
+            --fundo-pagina: #eaf3ec;
+            /* Verde pastel suave */
+            --texto-principal: #2d3732;
+            --texto-secundario: #58685f;
             --branco: #ffffff;
-            --borda: #d2e2d5;             
+            --borda: #d2e2d5;
         }
 
         * {
@@ -32,7 +34,7 @@
             display: flex;
             background-color: var(--fundo-pagina);
             /* Barrado de matinhos suave e translúcido na base */
-            background-image: 
+            background-image:
                 url("data:image/svg+xml,%3Csvg width='140' height='120' viewBox='0 0 140 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 120 Q20 60 10 20 M20 70 Q35 40 45 10 M20 75 Q12 45 5 25 M70 120 Q70 50 55 10 M70 60 Q90 35 100 10 M70 80 Q85 50 95 25 M120 120 Q125 70 135 20 M120 75 Q105 40 95 15' stroke='%237da87f' stroke-opacity='0.4' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
             background-repeat: repeat-x;
             background-position: bottom 0px center;
@@ -89,6 +91,7 @@
         aside nav::-webkit-scrollbar {
             width: 4px;
         }
+
         aside nav::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 4px;
@@ -171,7 +174,7 @@
             padding: 6px 16px 6px 6px;
             border-radius: 30px;
             border: 1px solid var(--borda);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
         }
 
         .card-professora img {
@@ -317,6 +320,7 @@
             font-weight: 600;
             cursor: pointer;
         }
+
         .link-ver-mais:hover {
             text-decoration: underline;
         }
@@ -329,6 +333,7 @@
             padding: 10px 0;
             border-bottom: 1px dashed #eaf2eb;
         }
+
         .timeline-item:last-child {
             border-bottom: none;
         }
@@ -339,13 +344,19 @@
             gap: 12px;
         }
 
-        .dot-verde { background-color: #52b788; width: 10px; height: 10px; border-radius: 50%; }
+        .dot-verde {
+            background-color: #52b788;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
 
         .timeline-info h5 {
             font-size: 13px;
             color: var(--texto-principal);
             font-weight: 600;
         }
+
         .timeline-info p {
             font-size: 11px;
             color: var(--texto-secundario);
@@ -427,7 +438,8 @@
             text-align: left;
         }
 
-        th, td {
+        th,
+        td {
             padding: 12px 14px;
             border-bottom: 1px solid #eaf2eb;
             font-size: 13px;
@@ -472,7 +484,8 @@
             color: var(--texto-principal);
         }
 
-        .form-group input, .form-group select {
+        .form-group input,
+        .form-group select {
             padding: 10px 12px;
             border: 1px solid var(--borda);
             border-radius: 10px;
@@ -490,10 +503,13 @@
             font-weight: 600;
             cursor: pointer;
             font-size: 13px;
-            box-shadow: 0 4px 10px rgba(40,94,67,0.15);
+            box-shadow: 0 4px 10px rgba(40, 94, 67, 0.15);
             transition: 0.2s;
         }
-        .btn-salvar:hover { background-color: var(--cor-primaria-hover); }
+
+        .btn-salvar:hover {
+            background-color: var(--cor-primaria-hover);
+        }
 
         .btn-cancelar {
             background-color: #adb5bd;
@@ -541,7 +557,10 @@
             padding: 15px;
             border-top: 1px solid var(--borda);
         }
-        .sanfona-content.ativo { display: block; }
+
+        .sanfona-content.ativo {
+            display: block;
+        }
 
         .badge-pacote {
             background-color: var(--cor-primaria);
@@ -553,7 +572,10 @@
 
         .modal-overlay {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(40, 94, 67, 0.4);
             backdrop-filter: blur(3px);
             display: none;
@@ -568,7 +590,7 @@
             border-radius: 18px;
             width: 450px;
             max-width: 90%;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
             border: 1px solid var(--borda);
         }
 
@@ -581,7 +603,7 @@
             height: 80vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
         }
 
         .dias-semana-grid {
@@ -704,16 +726,20 @@
                             <a class="link-ver-mais" onclick="navegar('agenda')">Ver agenda completa ›</a>
                         </div>
                         <div id="dash-timeline-agenda" style="display: flex; flex-direction: column; gap: 10px;">
-                            <p style="color: var(--texto-secundario); font-size: 13px; text-align: center; padding: 10px;">Nenhum agendamento para hoje.</p>
+                            <p
+                                style="color: var(--texto-secundario); font-size: 13px; text-align: center; padding: 10px;">
+                                Nenhum agendamento para hoje.</p>
                         </div>
                     </div>
 
                     <div class="dash-card-box">
                         <div class="dash-card-header">
                             <h3>📓 Diário de Anotações</h3>
-                            <button type="button" class="btn-salvar" style="padding: 4px 10px; font-size: 11px;" onclick="abrirModalDiario()">➕ Novo</button>
+                            <button type="button" class="btn-salvar" style="padding: 4px 10px; font-size: 11px;"
+                                onclick="abrirModalDiario()">➕ Novo</button>
                         </div>
-                        <div id="lista-diario-dashboard" style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                        <div id="lista-diario-dashboard"
+                            style="max-height: 180px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
                         </div>
                     </div>
                 </div>
@@ -736,7 +762,8 @@
                     <div class="dash-card-box">
                         <div class="dash-card-header">
                             <h3>🗓️ Mini Planner</h3>
-                            <button type="button" class="btn-salvar" style="padding: 4px 10px; font-size: 11px;" onclick="abrirCalendarioGrande()">Expandir</button>
+                            <button type="button" class="btn-salvar" style="padding: 4px 10px; font-size: 11px;"
+                                onclick="abrirCalendarioGrande()">Expandir</button>
                         </div>
                         <div id="calendar-dash" style="font-size: 11px; max-height: 200px; overflow: hidden;"></div>
                     </div>
@@ -753,7 +780,8 @@
         <!-- TELA 2: ALUNOS -->
         <section id="tela-alunos" class="tela">
             <div class="form-container">
-                <h3 id="form-titulo" style="color: var(--cor-primaria); margin-bottom: 15px;">Novo Cadastro de Aluno</h3>
+                <h3 id="form-titulo" style="color: var(--cor-primaria); margin-bottom: 15px;">Novo Cadastro de Aluno
+                </h3>
                 <form id="formAluno">
                     <input type="hidden" id="matriculaEditando" value="">
                     <div class="form-grid">
@@ -804,7 +832,8 @@
                                 <option value="SEMANAL">SEMANAL</option>
                             </select>
                         </div>
-                        <div class="form-group" style="flex-direction: row; align-items: center; gap: 8px; margin-top: 20px;">
+                        <div class="form-group"
+                            style="flex-direction: row; align-items: center; gap: 8px; margin-top: 20px;">
                             <input type="checkbox" id="temNecessidadeEspecial" onchange="toggleNecessidadeDesc()">
                             <label for="temNecessidadeEspecial" style="margin: 0;">Possui NEE?</label>
                         </div>
@@ -823,7 +852,8 @@
             <div class="table-container">
                 <div class="table-header-flex">
                     <h3 style="color: var(--cor-primaria);">Listagem de Alunos Ativos</h3>
-                    <input type="text" id="inputBusca" class="input-busca" onkeyup="filtrarAlunos()" placeholder="🔍 Buscar aluno...">
+                    <input type="text" id="inputBusca" class="input-busca" onkeyup="filtrarAlunos()"
+                        placeholder="🔍 Buscar aluno...">
                 </div>
                 <table>
                     <thead>
@@ -885,7 +915,8 @@
                     <h3 style="color: var(--cor-primaria);">Pacotes e Aulas por Aluno</h3>
                 </div>
                 <div id="container-sanfona-agendamentos">
-                    <p style="color: var(--texto-secundario); font-size: 13px; text-align: center; padding: 20px;">Nenhum agendamento encontrado.</p>
+                    <p style="color: var(--texto-secundario); font-size: 13px; text-align: center; padding: 20px;">
+                        Nenhum agendamento encontrado.</p>
                 </div>
             </div>
         </section>
@@ -927,7 +958,8 @@
     <!-- MODAIS -->
     <div id="modalCalendarioGrande" class="modal-overlay">
         <div class="modal-calendario-card">
-            <h3 style="color: var(--cor-primaria); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3
+                style="color: var(--cor-primaria); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                 <span>📅 Planner Completo</span>
                 <button type="button" class="btn-perigo" onclick="fecharCalendarioGrande()">✖ Fechar</button>
             </h3>
@@ -1025,7 +1057,8 @@
 
     <div id="modalDiario" class="modal-overlay">
         <div class="modal-card">
-            <h3 id="modal-diario-titulo" style="color: var(--cor-primaria); margin-bottom: 15px;">Nova Anotação no Diário</h3>
+            <h3 id="modal-diario-titulo" style="color: var(--cor-primaria); margin-bottom: 15px;">Nova Anotação no
+                Diário</h3>
             <input type="hidden" id="diario-edit-id">
             <div class="form-group" style="margin-bottom: 12px;">
                 <label>Data:</label>
@@ -1033,7 +1066,9 @@
             </div>
             <div class="form-group" style="margin-bottom: 12px;">
                 <label>Anotação:</label>
-                <textarea id="diario-texto" style="width:100%; height:120px; padding:10px; border:1px solid var(--borda); border-radius:10px;" placeholder="Escreva aqui..."></textarea>
+                <textarea id="diario-texto"
+                    style="width:100%; height:120px; padding:10px; border:1px solid var(--borda); border-radius:10px;"
+                    placeholder="Escreva aqui..."></textarea>
             </div>
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
                 <button type="button" class="btn-cancelar" onclick="fecharModais()">Cancelar</button>
@@ -1212,16 +1247,16 @@
                 document.querySelectorAll('.dash-total-alunos').forEach(el => el.innerText = alunosCache.length);
 
                 let alfabetizados = 0;
-                let niveis = { 'GARATUJA':0, 'PRE_SILABICA':0, 'SILABICA_SEM_VALOR_SONORO':0, 'SILABICA_COM_VALOR_SONORO':0, 'SILABICO_ALFABETICA':0, 'ALFABETICA':0, 'ORTOGRAFICA':0 };
+                let niveis = { 'GARATUJA': 0, 'PRE_SILABICA': 0, 'SILABICA_SEM_VALOR_SONORO': 0, 'SILABICA_COM_VALOR_SONORO': 0, 'SILABICO_ALFABETICA': 0, 'ALFABETICA': 0, 'ORTOGRAFICA': 0 };
 
                 const relBody = document.querySelector('#tabela-relatorio-geral tbody');
-                if(relBody) relBody.innerHTML = '';
+                if (relBody) relBody.innerHTML = '';
 
                 alunosCache.forEach(a => {
                     if (a.nivelLeitura === 'ORTOGRAFICA' || a.nivelLeitura === 'ALFABETICA') alfabetizados++;
                     if (niveis[a.nivelLeitura] !== undefined) niveis[a.nivelLeitura]++;
 
-                    if(relBody) {
+                    if (relBody) {
                         const tr = document.createElement('tr');
                         const resp = getResponsavel(a) || '--';
                         const tel = getTelefone(a) || '--';
@@ -1240,7 +1275,7 @@
         function atualizarSelectsModal() {
             ['modal-select-aluno', 'pacote-select-aluno'].forEach(id => {
                 const sel = document.getElementById(id);
-                if(sel) {
+                if (sel) {
                     sel.innerHTML = '<option value="">Selecione...</option>';
                     alunosCache.forEach(a => sel.innerHTML += `<option value="${a.matricula}">${a.nome}</option>`);
                 }
@@ -1249,7 +1284,7 @@
 
         function renderizarTabelaAlunos(lista) {
             const tbody = document.getElementById('tabela-alunos-body');
-            if(!tbody) return;
+            if (!tbody) return;
             tbody.innerHTML = '';
             lista.forEach(a => {
                 const temNee = a.temNecessidadeEspecial !== undefined ? a.temNecessidadeEspecial : a.temNecessidade;
@@ -1282,7 +1317,7 @@
 
         function prepararEdicao(matricula) {
             const a = alunosCache.find(x => x.matricula === matricula);
-            if(!a) return;
+            if (!a) return;
             document.getElementById('matriculaEditando').value = a.matricula;
             document.getElementById('nome').value = a.nome;
             document.getElementById('dataNascimento').value = a.dataNascimento || '';
@@ -1326,15 +1361,15 @@
                 temNecessidadeEspecial: document.getElementById('temNecessidadeEspecial').checked,
                 descricaoNecessidade: document.getElementById('descricaoNecessidade').value
             };
-            await fetch('/api/alunos', { method: mat ? 'PUT' : 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(dados) });
+            await fetch('/api/alunos', { method: mat ? 'PUT' : 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dados) });
             limparFormulario();
             await carregarAlunos();
             navegar('alunos');
         });
 
         async function removerAluno(matricula) {
-            if(confirm("Remover aluno?")) {
-                await fetch('/api/alunos', { method: 'DELETE', headers:{'Content-Type':'application/json'}, body: JSON.stringify({matricula}) });
+            if (confirm("Remover aluno?")) {
+                await fetch('/api/alunos', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ matricula }) });
                 await carregarAlunos();
             }
         }
@@ -1350,30 +1385,34 @@
             };
 
             const ctx1 = document.getElementById('graficoPizzaDash');
-            if(ctx1) {
-                if(graficoPizzaDashInstancia) graficoPizzaDashInstancia.destroy();
+            if (ctx1) {
+                if (graficoPizzaDashInstancia) graficoPizzaDashInstancia.destroy();
                 graficoPizzaDashInstancia = new Chart(ctx1, config);
             }
             const ctx2 = document.getElementById('graficoPizzaRelatorio');
-            if(ctx2) {
-                if(graficoPizzaRelInstancia) graficoPizzaRelInstancia.destroy();
+            if (ctx2) {
+                if (graficoPizzaRelInstancia) graficoPizzaRelInstancia.destroy();
                 graficoPizzaRelInstancia = new Chart(ctx2, config);
             }
         }
 
         async function carregarTabelaEAgenda() {
             try {
+                // Salva quais matrículas estão com a sanfona aberta no momento
+                const abertos = Array.from(document.querySelectorAll('.sanfona-content.ativo'))
+                    .map(el => el.closest('.sanfona-item').dataset.matricula);
+
                 const res = await fetch("/api/agendamentos");
                 agendamentosCache = await res.json();
-                
+
                 document.getElementById('dash-total-aulas').innerText = agendamentosCache.length;
 
-                // Timeline Agenda de Hoje no Dashboard
+                // (Código da Timeline de hoje continua igual...)
                 const hojeStr = new Date().toISOString().split('T')[0];
                 const timelineContainer = document.getElementById('dash-timeline-agenda');
-                if(timelineContainer) {
+                if (timelineContainer) {
                     const hojeAulas = agendamentosCache.filter(a => a.data === hojeStr);
-                    if(hojeAulas.length === 0) {
+                    if (hojeAulas.length === 0) {
                         timelineContainer.innerHTML = `<p style="color:var(--texto-secundario); font-size:12px; text-align:center; padding:10px;">Nenhuma aula agendada para hoje.</p>`;
                     } else {
                         timelineContainer.innerHTML = '';
@@ -1402,12 +1441,12 @@
                     containerSanfona.innerHTML = "";
                     const porAluno = {};
                     agendamentosCache.forEach(a => {
-                        if(!porAluno[a.matriculaAluno]) porAluno[a.matriculaAluno] = [];
+                        if (!porAluno[a.matriculaAluno]) porAluno[a.matriculaAluno] = [];
                         porAluno[a.matriculaAluno].push(a);
                     });
 
                     const mats = Object.keys(porAluno);
-                    if(mats.length === 0) {
+                    if (mats.length === 0) {
                         containerSanfona.innerHTML = `<p style="color:var(--texto-secundario); font-size:13px; text-align:center; padding:15px;">Nenhum agendamento encontrado.</p>`;
                     } else {
                         mats.forEach((mat, idx) => {
@@ -1422,8 +1461,8 @@
                                     <tr>
                                         <td>${a.data}</td>
                                         <td>${a.hora}</td>
-                                        <td><button class="btn-salvar" style="padding:3px 8px; font-size:11px; background:${a.pago?'#52b788':'#e07a5f'}" onclick="alternarStatusAula('${a.id}')">${a.pago?'PAGO':'PENDENTE'}</button></td>
-                                        <td>${a.observacao || 'Aula'} (${i+1}/${total})</td>
+                                        <td><button class="btn-salvar" style="padding:3px 8px; font-size:11px; background:${a.pago ? '#52b788' : '#e07a5f'}" onclick="alternarStatusAula('${a.id}')">${a.pago ? 'PAGO' : 'PENDENTE'}</button></td>
+                                        <td>${a.observacao || 'Aula'} (${i + 1}/${total})</td>
                                         <td><button onclick="abrirModalDetalhe('${a.id}')" style="background:none;border:none;cursor:pointer;">⚙️</button></td>
                                     </tr>
                                 `;
@@ -1431,12 +1470,13 @@
 
                             const item = document.createElement('div');
                             item.className = 'sanfona-item';
+                            item.dataset.matricula = mat; // Atributo para identificar
                             item.innerHTML = `
                                 <div class="sanfona-header" onclick="this.nextElementSibling.classList.toggle('ativo')">
                                     <span>🌱 ${nome}</span>
                                     <span class="badge-pacote">Pacote [${concluidas}/${total}]</span>
                                 </div>
-                                <div class="sanfona-content">
+                                <div class="sanfona-content ${abertos.includes(mat) ? 'ativo' : ''}">
                                     <table>
                                         <thead><tr><th>Data</th><th>Hora</th><th>Status</th><th>Obs</th><th>Ações</th></tr></thead>
                                         <tbody>${linhas}</tbody>
@@ -1461,18 +1501,18 @@
 
         async function alternarStatusAula(id) {
             const ag = agendamentosCache.find(a => a.id === id);
-            if(!ag) return;
-            await fetch("/api/agendamentos", { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify({...ag, pago: !ag.pago}) });
+            if (!ag) return;
+            await fetch("/api/agendamentos", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...ag, pago: !ag.pago }) });
             await carregarTabelaEAgenda();
         }
 
         function inicializarCalendarios(eventos) {
             ['calendar-dash', 'calendar-grande', 'calendar-agenda'].forEach(id => {
                 const el = document.getElementById(id);
-                if(el) {
-                    if(id === 'calendar-dash' && calendarDash) calendarDash.destroy();
-                    if(id === 'calendar-grande' && calendarGrande) calendarGrande.destroy();
-                    if(id === 'calendar-agenda' && calendarAgenda) calendarAgenda.destroy();
+                if (el) {
+                    if (id === 'calendar-dash' && calendarDash) calendarDash.destroy();
+                    if (id === 'calendar-grande' && calendarGrande) calendarGrande.destroy();
+                    if (id === 'calendar-agenda' && calendarAgenda) calendarAgenda.destroy();
 
                     const cal = new FullCalendar.Calendar(el, {
                         initialView: id === 'calendar-agenda' ? 'timeGridWeek' : 'dayGridMonth',
@@ -1486,14 +1526,14 @@
                     });
                     cal.render();
 
-                    if(id === 'calendar-dash') calendarDash = cal;
-                    if(id === 'calendar-grande') calendarGrande = cal;
-                    if(id === 'calendar-agenda') calendarAgenda = cal;
+                    if (id === 'calendar-dash') calendarDash = cal;
+                    if (id === 'calendar-grande') calendarGrande = cal;
+                    if (id === 'calendar-agenda') calendarAgenda = cal;
                 }
             });
         }
 
-        function abrirCalendarioGrande() { document.getElementById('modalCalendarioGrande').style.display = 'flex'; if(calendarGrande) calendarGrande.render(); }
+        function abrirCalendarioGrande() { document.getElementById('modalCalendarioGrande').style.display = 'flex'; if (calendarGrande) calendarGrande.render(); }
         function fecharCalendarioGrande() { document.getElementById('modalCalendarioGrande').style.display = 'none'; }
         function fecharModais() { document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'); }
 
@@ -1508,9 +1548,9 @@
             const data = document.getElementById('modal-data').value;
             const hora = document.getElementById('modal-hora').value;
             const obs = document.getElementById('modal-obs').value;
-            if(!mat || !data || !hora) return alert("Preencha todos os campos.");
-            
-            await fetch("/api/agendamentos", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({matriculaAluno: mat, data, hora, observacao: obs}) });
+            if (!mat || !data || !hora) return alert("Preencha todos os campos.");
+
+            await fetch("/api/agendamentos", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ matriculaAluno: mat, data, hora, observacao: obs }) });
             fecharModais();
             await carregarTabelaEAgenda();
         }
@@ -1527,16 +1567,18 @@
             const hora = document.getElementById('pacote-hora').value;
             const dias = Array.from(document.querySelectorAll('.chk-dia:checked')).map(cb => parseInt(cb.value));
 
-            if(!mat || !inicio || dias.length === 0) return alert("Preencha todos os campos e selecione os dias.");
+            if (!mat || !inicio || dias.length === 0) return alert("Preencha todos os campos e selecione os dias.");
 
             let cur = new Date(inicio + 'T00:00:00');
             let criadas = 0;
-            while(criadas < qtd) {
-                if(dias.includes(cur.getDay())) {
+            while (criadas < qtd) {
+                if (dias.includes(cur.getDay())) {
                     criadas++;
-                    await fetch("/api/agendamentos", { method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({
-                        matriculaAluno: mat, data: cur.toISOString().split('T')[0], hora, observacao: `Pacote (${criadas}/${qtd})`
-                    })});
+                    await fetch("/api/agendamentos", {
+                        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+                            matriculaAluno: mat, data: cur.toISOString().split('T')[0], hora, observacao: `Pacote (${criadas}/${qtd})`
+                        })
+                    });
                 }
                 cur.setDate(cur.getDate() + 1);
             }
@@ -1546,7 +1588,7 @@
 
         function abrirModalDetalhe(id) {
             const ag = agendamentosCache.find(a => a.id === id);
-            if(!ag) return;
+            if (!ag) return;
             document.getElementById('detalhe-id').value = ag.id;
             document.getElementById('detalhe-info-aluno').innerText = `Aluno: ${alunosMap[ag.matriculaAluno] || ag.matriculaAluno}`;
             document.getElementById('detalhe-data').value = ag.data;
@@ -1559,16 +1601,16 @@
             const data = document.getElementById('detalhe-data').value;
             const hora = document.getElementById('detalhe-hora').value;
             const ag = agendamentosCache.find(a => a.id === id);
-            if(!ag) return;
+            if (!ag) return;
 
-            await fetch("/api/agendamentos", { method: "PUT", headers: {"Content-Type":"application/json"}, body: JSON.stringify({...ag, data, hora}) });
+            await fetch("/api/agendamentos", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...ag, data, hora }) });
             fecharModais();
             await carregarTabelaEAgenda();
         }
 
         async function excluirAulaModal() {
             const id = document.getElementById('detalhe-id').value;
-            if(confirm("Excluir agendamento?")) {
+            if (confirm("Excluir agendamento?")) {
                 await fetch(`/api/agendamentos?id=${id}`, { method: "DELETE" });
                 fecharModais();
                 await carregarTabelaEAgenda();
@@ -1580,14 +1622,14 @@
                 .then(res => res.json())
                 .then(alunos => {
                     const tbody = document.getElementById('tabela-financeiro-body');
-                    if(!tbody) return;
+                    if (!tbody) return;
                     tbody.innerHTML = '';
                     let recebido = 0, pendente = 0;
 
                     alunos.forEach(a => {
                         const val = a.valorContrato || 0;
                         const status = a.statusPagamento || 'PENDENTE';
-                        if(status === 'EM_DIA') recebido += val; else pendente += val;
+                        if (status === 'EM_DIA') recebido += val; else pendente += val;
 
                         const valFmt = val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
