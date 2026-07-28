@@ -4,10 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projeto Reforço - Painel Administrativo</title>
+    <title>Sementes do Saber - Painel Administrativo</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
     <style>
+        :root {
+            --cor-primaria: #2d6a4f;      /* Verde folha profundo */
+            --cor-primaria-hover: #40916c; /* Verde claro ao passar o mouse */
+            --cor-secundaria: #e8f4ec;    /* Fundo verde bem suave */
+            --cor-destaque: #d4a373;      /* Tom terroso aconchegante */
+            --fundo-pagina: #fbf9f3;      /* Creme suave e acolhedor (Ivory/Cream) */
+            --texto-principal: #2b3a32;   /* Texto escuro orgânico */
+            --texto-secundario: #606c64;  /* Cinza esverdeado suave */
+            --branco: #ffffff;
+            --borda: #e2dec9;             /* Borda em tom creme/terroso suave */
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -17,65 +29,93 @@
 
         body {
             display: flex;
-            background-color: #f4f6f9;
-            color: #333;
+            background-color: var(--fundo-pagina);
+            /* IMAGEM DE FUNDO COM MARCA D'ÁGUA SUAVE */
+            /* Dica: Você pode trocar a URL abaixo por uma imagem local, ex: url('sua-imagem.jpg') */
+            background-image: linear-gradient(rgba(251, 249, 243, 0.93), rgba(251, 249, 243, 0.93)), 
+                              url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--texto-principal);
             height: 100vh;
         }
 
         aside {
-            width: 240px;
-            background-color: #4a7c59;
-            color: white;
-            padding: 20px;
+            width: 260px;
+            background-color: var(--cor-primaria);
+            color: var(--branco);
+            padding: 25px 20px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
+            box-shadow: 4px 0 15px rgba(45, 106, 79, 0.08);
+            z-index: 10;
         }
 
-        aside h2 {
-            font-size: 20px;
+        .logo-area {
             text-align: center;
             margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            padding-bottom: 15px;
+        }
+
+        .logo-area h2 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            color: #d8f3dc;
+        }
+
+        .logo-area p {
+            font-size: 11px;
+            color: #b7e4c7;
+            margin-top: 5px;
+            font-style: italic;
+            line-height: 1.3;
         }
 
         aside nav ul {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         aside nav a {
-            color: white;
+            color: #e2f0d9;
             text-decoration: none;
-            padding: 12px;
+            padding: 12px 15px;
             display: block;
-            border-radius: 6px;
+            border-radius: 10px;
             transition: 0.3s;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         aside nav a:hover,
         aside nav a.ativo {
-            background-color: rgba(255, 255, 255, 0.25);
-            font-weight: bold;
+            background-color: rgba(255, 255, 255, 0.15);
+            color: var(--branco);
+            font-weight: 600;
+            transform: translateX(4px);
         }
 
         main {
             flex: 1;
-            padding: 30px;
+            padding: 35px;
             overflow-y: auto;
         }
 
         header {
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         header h1 {
             font-size: 26px;
-            color: #2c3e50;
+            color: var(--cor-primaria);
+            font-weight: 700;
         }
 
         .tela {
@@ -88,41 +128,49 @@
 
         .cards-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            background: var(--branco);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(45, 106, 79, 0.05);
             text-align: center;
-            border-left: 5px solid #4a7c59;
+            border: 1px solid var(--borda);
+            border-left: 6px solid var(--cor-primaria);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
         }
 
         .card.card-sucesso {
-            border-left-color: #2ecc71;
+            border-left-color: #52b788;
         }
 
         .card h3 {
-            font-size: 13px;
-            color: #7f8c8d;
-            margin-bottom: 10px;
+            font-size: 12px;
+            color: var(--texto-secundario);
+            margin-bottom: 8px;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
         }
 
         .card p {
-            font-size: 26px;
+            font-size: 30px;
             font-weight: bold;
-            color: #2c3e50;
+            color: var(--cor-primaria);
         }
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 22px;
             margin-bottom: 30px;
         }
 
@@ -131,33 +179,45 @@
         .chart-container,
         .dash-widget,
         .calendar-container {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            margin-bottom: 30px;
+            background: var(--branco);
+            padding: 26px;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(45, 106, 79, 0.05);
+            margin-bottom: 25px;
+            border: 1px solid var(--borda);
         }
 
         .table-header-flex {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
         .table-container h3,
         .chart-container h3,
         .dash-widget h3 {
-            color: #2c3e50;
+            color: var(--cor-primaria);
+            font-size: 16px;
             margin-bottom: 15px;
+            font-weight: 700;
         }
 
         .input-busca {
-            padding: 8px 14px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+            padding: 10px 16px;
+            border: 1px solid var(--borda);
+            border-radius: 10px;
             font-size: 14px;
             width: 280px;
+            outline: none;
+            background-color: #fcfbfa;
+            transition: 0.2s;
+        }
+
+        .input-busca:focus {
+            border-color: var(--cor-primaria);
+            background-color: var(--branco);
+            box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
         }
 
         table {
@@ -168,30 +228,32 @@
 
         th,
         td {
-            padding: 12px 15px;
-            border-bottom: 1px solid #ddd;
+            padding: 13px 16px;
+            border-bottom: 1px solid #f0ede1;
+            font-size: 14px;
         }
 
         th {
-            background-color: #f8f9fa;
-            color: #555;
+            background-color: var(--cor-secundaria);
+            color: var(--cor-primaria);
             font-weight: 600;
         }
 
         tr:hover {
-            background-color: #f9f9f9;
+            background-color: #fdfcf9;
         }
 
         .badge-necessidade {
-            background-color: #e74c3c;
+            background-color: #e07a5f;
             color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 8px;
             font-size: 12px;
             display: inline-block;
             cursor: pointer;
             transition: 0.2s;
             text-align: center;
+            font-weight: 600;
         }
 
         .badge-necessidade:hover {
@@ -201,28 +263,38 @@
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            gap: 16px;
             margin-bottom: 15px;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
         }
 
         .form-group label {
             font-size: 13px;
-            font-weight: bold;
-            color: #555;
+            font-weight: 600;
+            color: var(--texto-principal);
         }
 
         .form-group input,
         .form-group select {
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 11px 14px;
+            border: 1px solid var(--borda);
+            border-radius: 10px;
             font-size: 14px;
+            outline: none;
+            background-color: #fcfbfa;
+            transition: 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--cor-primaria);
+            background-color: var(--branco);
+            box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
         }
 
         .checkbox-group {
@@ -233,63 +305,69 @@
         }
 
         .btn-salvar {
-            background-color: #4a7c59;
+            background-color: var(--cor-primaria);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            font-weight: bold;
+            padding: 11px 22px;
+            border-radius: 10px;
+            font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(45, 106, 79, 0.15);
         }
 
         .btn-salvar:hover {
-            background-color: #3b6346;
+            background-color: var(--cor-primaria-hover);
+            transform: translateY(-1px);
         }
 
         .btn-cancelar {
-            background-color: #95a5a6;
+            background-color: #adb5bd;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 4px;
-            font-weight: bold;
+            padding: 11px 22px;
+            border-radius: 10px;
+            font-weight: 600;
             cursor: pointer;
             transition: 0.3s;
+            font-size: 14px;
         }
         
         .btn-cancelar:hover {
-            background-color: #7f8c8d;
+            background-color: #6c757d;
         }
 
         .btn-perigo {
-            background-color: #e74c3c;
+            background-color: #e07a5f;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            font-weight: bold;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
+            transition: 0.2s;
+            font-size: 13px;
+        }
+
+        .btn-perigo:hover {
+            opacity: 0.9;
         }
 
         .btn-status-aula {
             border: none;
             background: none;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: bold;
             cursor: pointer;
-            padding: 4px 10px;
-            border-radius: 4px;
+            padding: 5px 12px;
+            border-radius: 8px;
             transition: 0.2s;
-        }
-
-        .btn-status-aula:hover {
-            background-color: rgba(0, 0, 0, 0.05);
         }
 
         .chart-wrapper {
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             margin: 0 auto;
         }
 
@@ -298,69 +376,70 @@
         }
 
         .progress-bar-bg {
-            background-color: #e9ecef;
-            border-radius: 8px;
-            height: 18px;
+            background-color: var(--cor-secundaria);
+            border-radius: 10px;
+            height: 16px;
             width: 100%;
             overflow: hidden;
             margin-top: 8px;
+            border: 1px solid var(--borda);
         }
 
         .progress-bar-fill {
-            background-color: #2ecc71;
+            background-color: #52b788;
             height: 100%;
             width: 0%;
-            transition: width 0.5s ease;
+            transition: width 0.6s ease;
         }
 
         /* Estilos da Sanfona de Alunos na Agenda */
         .sanfona-item {
-            background: white;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            margin-bottom: 10px;
+            background: var(--branco);
+            border: 1px solid var(--borda);
+            border-radius: 12px;
+            margin-bottom: 12px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 12px rgba(45, 106, 79, 0.03);
         }
 
         .sanfona-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
-            background-color: #f8f9fa;
+            padding: 16px 20px;
+            background-color: var(--cor-secundaria);
             cursor: pointer;
             user-select: none;
             transition: background 0.2s;
         }
 
         .sanfona-header:hover {
-            background-color: #edf2f7;
+            background-color: #d8f3dc;
         }
 
         .sanfona-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #2c3e50;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--cor-primaria);
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
         .badge-pacote {
-            background-color: #4a7c59;
+            background-color: var(--cor-primaria);
             color: white;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 13px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
             font-weight: 600;
         }
 
         .sanfona-content {
             display: none;
             padding: 15px;
-            border-top: 1px solid #e0e0e0;
-            background-color: #ffffff;
+            border-top: 1px solid var(--borda);
+            background-color: var(--branco);
         }
 
         .sanfona-content.ativo {
@@ -368,28 +447,26 @@
         }
 
         .fc-toolbar-title {
-            font-size: 16px !important;
-            color: #2c3e50;
+            font-size: 15px !important;
+            color: var(--cor-primaria) !important;
+            font-weight: 600;
         }
 
         .fc-button-primary {
-            background-color: #4a7c59 !important;
-            border-color: #4a7c59 !important;
+            background-color: var(--cor-primaria) !important;
+            border-color: var(--cor-primaria) !important;
+            border-radius: 8px !important;
         }
 
         .fc-event {
             cursor: pointer;
-            padding: 2px 4px;
-            font-weight: bold;
+            padding: 3px 6px;
+            font-weight: 600;
             white-space: normal !important;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-size: 12px;
-        }
-
-        .fc-daygrid-event {
-            white-space: normal !important;
-            align-items: normal;
+            font-size: 11px;
+            border-radius: 6px;
         }
 
         .modal-overlay {
@@ -398,7 +475,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(43, 58, 50, 0.4);
+            backdrop-filter: blur(3px);
             display: none;
             justify-content: center;
             align-items: center;
@@ -406,18 +484,20 @@
         }
 
         .modal-card {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            width: 450px;
+            background: var(--branco);
+            padding: 28px;
+            border-radius: 18px;
+            width: 460px;
             max-width: 90%;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 15px 35px rgba(45, 106, 79, 0.12);
+            border: 1px solid var(--borda);
         }
 
         .modal-card h3 {
-            margin-bottom: 15px;
-            color: #2c3e50;
-            border-bottom: 2px solid #4a7c59;
+            margin-bottom: 18px;
+            color: var(--cor-primaria);
+            font-size: 18px;
+            border-bottom: 2px solid var(--cor-secundaria);
             padding-bottom: 8px;
         }
 
@@ -429,21 +509,21 @@
         }
 
         .modal-calendario-card {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
+            background: var(--branco);
+            padding: 28px;
+            border-radius: 18px;
             width: 900px;
             max-width: 95%;
             height: 80vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 35px rgba(45, 106, 79, 0.15);
         }
 
         .modal-calendario-card h3 {
             margin-bottom: 15px;
-            color: #2c3e50;
-            border-bottom: 2px solid #4a7c59;
+            color: var(--cor-primaria);
+            border-bottom: 2px solid var(--cor-secundaria);
             padding-bottom: 8px;
             display: flex;
             justify-content: space-between;
@@ -459,10 +539,10 @@
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 8px;
-            background: #f8f9fa;
-            padding: 10px;
-            border-radius: 6px;
-            border: 1px solid #ddd;
+            background: var(--cor-secundaria);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--borda);
         }
 
         .dias-semana-grid label {
@@ -472,17 +552,26 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            color: var(--texto-principal);
         }
 
         .diario-textarea {
             width: 100%;
-            height: 180px;
+            height: 140px;
             padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
+            border: 1px solid var(--borda);
+            border-radius: 10px;
             font-size: 14px;
             resize: vertical;
             margin-top: 5px;
+            outline: none;
+            background-color: #fcfbfa;
+        }
+
+        .diario-textarea:focus {
+            border-color: var(--cor-primaria);
+            background-color: var(--branco);
+            box-shadow: 0 0 0 3px rgba(45, 106, 79, 0.1);
         }
     </style>
 </head>
@@ -490,7 +579,10 @@
 <body>
 
     <aside>
-        <h2>Projeto Reforço</h2>
+        <div class="logo-area">
+            <h2>🌱 Sementes do Saber</h2>
+            <p>Aprender com carinho, crescer com confiança.</p>
+        </div>
         <nav>
             <ul>
                 <li><a onclick="navegar('dashboard')" id="btn-dashboard" class="ativo">🏠 Dashboard</a></li>
@@ -523,10 +615,9 @@
             <div class="dashboard-grid">
                 <div class="dash-widget">
                     <h3>🎯 Índice de Alfabetização</h3>
-                    <p style="color: #666; font-size: 14px;">Percentual de alunos nos níveis ALFABETICA ou ORTOGRAFICA.
-                    </p>
+                    <p style="color: var(--texto-secundario); font-size: 13px;">Percentual de alunos nos níveis ALFABETICA ou ORTOGRAFICA.</p>
                     <div class="progress-box">
-                        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 14px;">
+                        <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 13px; color: var(--cor-primaria);">
                             <span>Progresso Atual</span>
                             <span id="dash-porcentagem-alfabetica">0%</span>
                         </div>
@@ -537,25 +628,24 @@
                 </div>
 
                 <div class="dash-widget">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <h3 style="margin: 0;">📅 Planner de Agendamentos</h3>
-                        <button type="button" class="btn-salvar" style="padding: 6px 12px; font-size: 12px;"
+                        <button type="button" class="btn-salvar" style="padding: 5px 10px; font-size: 12px;"
                             onclick="abrirCalendarioGrande()">🔍 Expandir</button>
                     </div>
-                    <p style="color: #666; font-size: 13px; margin-bottom: 10px;">Visualização rápida do mês atual.</p>
+                    <p style="color: var(--texto-secundario); font-size: 12px; margin-bottom: 10px;">Visualização rápida do mês.</p>
                     <div id="calendar-dash" style="max-height: 220px; overflow: hidden;"></div>
                 </div>
 
                 <div class="dash-widget">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                         <h3 style="margin: 0;">📓 Diário de Anotações</h3>
-                        <button type="button" class="btn-salvar" style="padding: 6px 12px; font-size: 12px;"
+                        <button type="button" class="btn-salvar" style="padding: 5px 10px; font-size: 12px;"
                             onclick="abrirModalDiario()">➕ Novo Diário</button>
                     </div>
-                    <p style="color: #666; font-size: 13px; margin-bottom: 10px;">Anotações diárias e recados.</p>
+                    <p style="color: var(--texto-secundario); font-size: 12px; margin-bottom: 10px;">Anotações diárias e recados.</p>
                     <div id="lista-diario-dashboard" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
-                        <!-- Anotações inseridas dinamicamente -->
+                        <!-- Anotações dinâmicas -->
                     </div>
                 </div>
             </div>
@@ -700,11 +790,9 @@
             <div class="calendar-container">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
                     <h3>📅 Agenda de Aulas Interativa</h3>
-                    <button class="btn-salvar" type="button" onclick="abrirModalPacote()">➕ Pacote Mensal de
-                        Aulas</button>
+                    <button class="btn-salvar" type="button" onclick="abrirModalPacote()">➕ Pacote Mensal de Aulas</button>
                 </div>
-                <p style="color: #666; font-size: 13px; margin-bottom: 15px;">💡 Clique em qualquer horário para
-                    agendar. Clique em uma aula para editar/excluir.</p>
+                <p style="color: var(--texto-secundario); font-size: 13px; margin-bottom: 15px;">💡 Clique em qualquer horário para agendar. Clique em uma aula para editar/excluir.</p>
                 <div id="calendar-agenda"></div>
             </div>
 
@@ -713,7 +801,7 @@
                     <h3>Relatório de Agendamentos por Aluno (Pacotes)</h3>
                 </div>
                 <div id="container-sanfona-agendamentos">
-                    <p style="color: #666; font-size: 14px; text-align: center; padding: 20px;">Nenhum agendamento encontrado.</p>
+                    <p style="color: var(--texto-secundario); font-size: 14px; text-align: center; padding: 20px;">Nenhum agendamento encontrado.</p>
                 </div>
             </div>
         </section>
@@ -733,7 +821,7 @@
 
             <div class="table-container">
                 <h3>Controle Financeiro</h3>
-                <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Acompanhamento de pagamentos e contratos dos alunos.</p>
+                <p style="color: var(--texto-secundario); font-size: 14px; margin-bottom: 15px;">Acompanhamento de pagamentos e contratos dos alunos.</p>
                 <div id="conteudo-financeiro">
                     <table>
                         <thead>
@@ -789,10 +877,8 @@
                 <input type="text" id="modal-obs" placeholder="Ex: Reforço de Matemática">
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn-cancelar" style="display:inline-block;"
-                    onclick="fecharModais()">Cancelar</button>
-                <button type="button" class="btn-salvar" onclick="salvarModalAgendamento()">Confirmar
-                    Agendamento</button>
+                <button type="button" class="btn-cancelar" style="display:inline-block;" onclick="fecharModais()">Cancelar</button>
+                <button type="button" class="btn-salvar" onclick="salvarModalAgendamento()">Confirmar Agendamento</button>
             </div>
         </div>
     </div>
@@ -833,8 +919,7 @@
                 <input type="text" id="pacote-obs" value="Pacote Mensal">
             </div>
             <div class="modal-actions">
-                <button type="button" class="btn-cancelar" style="display:inline-block;"
-                    onclick="fecharModais()">Cancelar</button>
+                <button type="button" class="btn-cancelar" style="display:inline-block;" onclick="fecharModais()">Cancelar</button>
                 <button type="button" class="btn-salvar" onclick="salvarPacoteMensal()">Gerar Aulas</button>
             </div>
         </div>
@@ -845,7 +930,7 @@
         <div class="modal-card">
             <h3>Gerenciar Agendamento</h3>
             <input type="hidden" id="detalhe-id">
-            <p style="margin-bottom: 15px;" id="detalhe-info-aluno">--</p>
+            <p style="margin-bottom: 15px; font-weight: 600; color: var(--cor-primaria);" id="detalhe-info-aluno">--</p>
             <div class="form-group" style="margin-bottom: 12px;">
                 <label>Reagendar Data:</label>
                 <input type="date" id="detalhe-data">
@@ -856,8 +941,7 @@
             </div>
             <div class="modal-actions">
                 <button type="button" class="btn-perigo" onclick="excluirAulaModal()">🗑️ Excluir Aula</button>
-                <button type="button" class="btn-cancelar" style="display:inline-block;"
-                    onclick="fecharModais()">Sair</button>
+                <button type="button" class="btn-cancelar" style="display:inline-block;" onclick="fecharModais()">Sair</button>
                 <button type="button" class="btn-salvar" onclick="salvarReagendamentoModal()">Salvar Alteração</button>
             </div>
         </div>
@@ -936,19 +1020,17 @@
             }
         }
 
-        // Funções do Diário de Anotações por Dia
         function carregarDiario() {
             const salvo = localStorage.getItem('projeto_reforco_diario_lista');
             let lista = salvo ? JSON.parse(salvo) : [];
             
-            // Ordenar por data decrescente (mais recente primeiro)
             lista.sort((a, b) => new Date(b.data) - new Date(a.data));
 
             const container = document.getElementById('lista-diario-dashboard');
             if (!container) return;
 
             if (lista.length === 0) {
-                container.innerHTML = `<p style="color: #888; font-size: 13px; text-align: center; padding: 15px;">Nenhuma anotação no diário.</p>`;
+                container.innerHTML = `<p style="color: var(--texto-secundario); font-size: 13px; text-align: center; padding: 15px;">Nenhuma anotação no diário.</p>`;
                 return;
             }
 
@@ -961,16 +1043,16 @@
                 }
 
                 const card = document.createElement('div');
-                card.style.cssText = "background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px; font-size: 13px;";
+                card.style.cssText = "background: var(--cor-secundaria); border: 1px solid var(--borda); border-radius: 10px; padding: 12px; font-size: 13px;";
                 card.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">
-                        <strong style="color: #4a7c59;">📅 ${dataFormatada}</strong>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid var(--borda); padding-bottom: 4px;">
+                        <strong style="color: var(--cor-primaria);">📅 ${dataFormatada}</strong>
                         <div style="display: flex; gap: 6px;">
-                            <button onclick="abrirModalDiario('${item.id}')" style="background:none; border:none; cursor:pointer; font-size:14px;" title="Editar">✏️</button>
-                            <button onclick="excluirDiario('${item.id}')" style="background:none; border:none; cursor:pointer; font-size:14px;" title="Excluir">🗑️</button>
+                            <button onclick="abrirModalDiario('${item.id}')" style="background:none; border:none; cursor:pointer; font-size:13px;" title="Editar">✏️</button>
+                            <button onclick="excluirDiario('${item.id}')" style="background:none; border:none; cursor:pointer; font-size:13px;" title="Excluir">🗑️</button>
                         </div>
                     </div>
-                    <p style="color: #333; white-space: pre-wrap; word-break: break-word;">${item.texto}</p>
+                    <p style="color: var(--texto-principal); white-space: pre-wrap; word-break: break-word;">${item.texto}</p>
                 `;
                 container.appendChild(card);
             });
@@ -1119,7 +1201,7 @@
                         <td>${aluno.nome}</td>
                         <td>${aluno.nivelLeitura}</td>
                         <td>${respNome}</td>
-                        <td>${respFone} <br><small style="color:#666;">${respEnd}</small></td>
+                        <td>${respFone} <br><small style="color:var(--texto-secundario);">${respEnd}</small></td>
                     `;
                     relatorioGeralBody.appendChild(linhaRelatorio);
                 });
@@ -1170,12 +1252,12 @@
                     <td>${aluno.nome}</td>
                     <td>${aluno.anoEscolar}</td>
                     <td>${aluno.nivelLeitura}</td>
-                    <td>R$ ${valorContrato.toFixed(2).replace('.', ',')} <br><small style="color:#666;">${cicloPagamento}</small></td>
-                    <td>${respNome} (${respFone})<br><small style="color:#666;">📍 ${respEnd}</small></td>
+                    <td>R$ ${valorContrato.toFixed(2).replace('.', ',')} <br><small style="color:var(--texto-secundario);">${cicloPagamento}</small></td>
+                    <td>${respNome} (${respFone})<br><small style="color:var(--texto-secundario);">📍 ${respEnd}</small></td>
                     <td>${temNee ? `<span class="badge-necessidade" onclick="alternarNEE('${aluno.matricula}')" title="Clique para ver a necessidade">Sim</span>` : '--'}</td>
                     <td>
-                        <button onclick="prepararEdicao('${aluno.matricula}')" style="background:none; border:none; cursor:pointer; font-size:16px;" title="Editar">✏️</button>
-                        <button onclick="removerAluno('${aluno.matricula}', '${aluno.nome}')" style="background:none; border:none; cursor:pointer; font-size:16px;" title="Remover">🗑️</button>
+                        <button onclick="prepararEdicao('${aluno.matricula}')" style="background:none; border:none; cursor:pointer; font-size:15px;" title="Editar">✏️</button>
+                        <button onclick="removerAluno('${aluno.matricula}', '${aluno.nome}')" style="background:none; border:none; cursor:pointer; font-size:15px;" title="Remover">🗑️</button>
                     </td>
                 `;
                 tabelaBody.appendChild(linha);
@@ -1233,12 +1315,12 @@
             if (meuGraficoPizza) meuGraficoPizza.destroy();
 
             meuGraficoPizza = new Chart(ctx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: Object.keys(niveis),
                     datasets: [{
                         data: Object.values(niveis),
-                        backgroundColor: ['#e74c3c', '#e67e22', '#f1c40f', '#3498db', '#9b59b6', '#2ecc71', '#1abc9c']
+                        backgroundColor: ['#e07a5f', '#f4a261', '#e9c46a', '#2a9d8f', '#264653', '#52b788', '#40916c']
                     }]
                 },
                 options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
@@ -1319,7 +1401,7 @@
                         id: a.id,
                         title: `${a.hora} ${alunosMap[a.matriculaAluno] || 'Aluno'}`,
                         start: `${a.data}T${a.hora}:00`,
-                        backgroundColor: '#4a7c59'
+                        backgroundColor: '#2d6a4f'
                     });
                 });
 
@@ -1327,7 +1409,7 @@
 
                 if (matriculas.length === 0) {
                     if (containerSanfona) {
-                        containerSanfona.innerHTML = `<p style="color: #666; font-size: 14px; text-align: center; padding: 20px;">Nenhum agendamento encontrado.</p>`;
+                        containerSanfona.innerHTML = `<p style="color: var(--texto-secundario); font-size: 14px; text-align: center; padding: 20px;">Nenhum agendamento encontrado.</p>`;
                     }
                 } else {
                     matriculas.forEach((mat, index) => {
@@ -1348,7 +1430,7 @@
                             }
 
                             const textoStatus = a.pago ? 'PAGO' : 'PENDENTE';
-                            const corStatus = a.pago ? '#27ae60' : '#c0392b';
+                            const corStatus = a.pago ? '#52b788' : '#e07a5f';
                             const tituloStatus = a.pago ? 'Pago (Clique para alterar)' : 'Pendente (Clique para alterar)';
                             const numAulaFormatado = `Aula ${idx + 1}/${totalAulas}`;
 
@@ -1371,10 +1453,10 @@
                             <div class="sanfona-header" onclick="toggleSanfona(this)">
                                 <div class="sanfona-title">
                                     <span>▼</span>
-                                    <span>👨‍🎓 ${nomeAluno}</span>
+                                    <span>🌱 ${nomeAluno}</span>
                                 </div>
                                 <div class="badge-pacote">
-                                    Pacote Mensal [${aulasRealizadas}/${totalAulas}]
+                                    Pacote [${aulasRealizadas}/${totalAulas}]
                                 </div>
                             </div>
                             <div class="sanfona-content" id="conteudo-sanfona-${index}">
@@ -1697,9 +1779,9 @@
                             <td>${cicloPagamento}</td>
                             <td>${aluno.statusPagamentoDesc || 'Pendente'}</td>
                             <td>
-                                <button onclick="mudarStatus('${aluno.nome}', 'EM_DIA')">✅ Em dia</button>
-                                <button onclick="mudarStatus('${aluno.nome}', 'PENDENTE')">⏳ Pendente</button>
-                                <button onclick="mudarStatus('${aluno.nome}', 'ATRASADO')">❌ Atrasado</button>
+                                <button onclick="mudarStatus('${aluno.nome}', 'EM_DIA')" class="btn-salvar" style="padding: 4px 8px; font-size: 12px;">✅ Em dia</button>
+                                <button onclick="mudarStatus('${aluno.nome}', 'PENDENTE')" class="btn-cancelar" style="padding: 4px 8px; font-size: 12px;">⏳ Pendente</button>
+                                <button onclick="mudarStatus('${aluno.nome}', 'ATRASADO')" class="btn-perigo" style="padding: 4px 8px; font-size: 12px;">❌ Atrasado</button>
                             </td>
                         `;
                         tbody.appendChild(tr);
@@ -1725,7 +1807,6 @@
             .catch(error => console.error('Erro:', error));
         }
 
-        // Execução inicial sequencial garantida
         async function inicializarSistema() {
             await carregarAlunos();
             await carregarTabelaEAgenda();
