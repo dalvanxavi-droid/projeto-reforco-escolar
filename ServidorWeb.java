@@ -35,10 +35,14 @@ public class ServidorWeb {
                 }
 
                 if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+                    // Ordena alfabeticamente para garantir que a matrícula nunca mude de lugar
+                    List<Aluno> alunosOrdenados = new ArrayList<>(alunos);
+                    alunosOrdenados.sort(java.util.Comparator.comparing(Aluno::getNome, String.CASE_INSENSITIVE_ORDER));
+
                     java.util.Map<String, Integer> contadorDatas = new java.util.HashMap<>();
                     StringBuilder json = new StringBuilder("[");
-                    for (int i = 0; i < alunos.size(); i++) {
-                        Aluno a = alunos.get(i);
+                    for (int i = 0; i < alunosOrdenados.size(); i++) {
+                        Aluno a = alunosOrdenados.get(i);
                         String respNome = a.getResponsavel() != null ? a.getResponsavel().nome() : "Sem cadastro";
                         String respFone = a.getResponsavel() != null ? a.getResponsavel().telefone() : "--";
                         String respEnd = a.getResponsavel() != null ? a.getResponsavel().endereco() : "";
@@ -55,8 +59,6 @@ public class ServidorWeb {
                         contadorDatas.put(dataBaseStr, seq);
                         String matriculaGerada = dataBaseStr + String.format("%03d", seq);
 
-                        // Montando o JSON com Locale.US para garantir o ponto decimal ao invés de
-                        // vírgula
                         json.append(String.format(java.util.Locale.US,
                                 "{\"matricula\":\"%s\",\"nome\":\"%s\",\"dataNascimento\":\"%s\",\"anoEscolar\":\"%s\",\"nivelLeitura\":\"%s\",\"temNecessidade\":%b,\"descricaoNecessidade\":\"%s\",\"responsavelNome\":\"%s\",\"responsavelTelefone\":\"%s\",\"responsavelEndereco\":\"%s\",\"statusPagamento\":\"%s\",\"statusPagamentoDesc\":\"%s\",\"valorContrato\":%.2f,\"cicloPagamento\":\"%s\"}",
                                 matriculaGerada, a.getNome(), a.getDataNascimento(), a.getAnoEscolar(),
@@ -67,7 +69,7 @@ public class ServidorWeb {
                                 a.getValorContrato(),
                                 a.getCicloPagamento() != null ? a.getCicloPagamento() : "MENSAL"));
 
-                        if (i < alunos.size() - 1)
+                        if (i < alunosOrdenados.size() - 1)
                             json.append(",");
                     }
                     json.append("]");
@@ -160,17 +162,18 @@ public class ServidorWeb {
                     os.close();
                 }
 
-                if ("DELETE".equalsIgnoreCase(exchange.getRequestMethod())) {
+               if ("DELETE".equalsIgnoreCase(exchange.getRequestMethod())) {
                     InputStream is = exchange.getRequestBody();
                     String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
                     String matricula = extrairValorJson(body, "matricula");
 
+                    List<Aluno> alunosOrdenados = new ArrayList<>(alunos);
+                    alunosOrdenados.sort(java.util.Comparator.comparing(Aluno::getNome, String.CASE_INSENSITIVE_ORDER));
+
                     java.util.Map<String, Integer> contadorDatas = new java.util.HashMap<>();
-                    java.util.Iterator<Aluno> iterator = alunos.iterator();
+                    Aluno alunoParaRemover = null;
 
-                    while (iterator.hasNext()) {
-                        Aluno a = iterator.next();
-
+                    for (Aluno a : alunosOrdenados) {
                         String dataBaseStr = "00000000";
                         if (a.getDataNascimento() != null) {
                             dataBaseStr = a.getDataNascimento()
@@ -181,9 +184,13 @@ public class ServidorWeb {
                         String matriculaGerada = dataBaseStr + String.format("%03d", seq);
 
                         if (matriculaGerada.equals(matricula.trim())) {
-                            iterator.remove();
+                            alunoParaRemover = a;
                             break;
                         }
+                    }
+
+                    if (alunoParaRemover != null) {
+                        alunos.remove(alunoParaRemover);
                     }
 
                     GerenciadorArquivo.salvarAlunos(new ArrayList<>(alunos));
