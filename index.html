@@ -313,18 +313,58 @@
             transition: width 0.5s ease;
         }
 
-        summary {
-            cursor: pointer;
-            font-weight: bold;
-            color: #2c3e50;
-            font-size: 16px;
-            padding: 10px;
-            background: #f8f9fa;
+        /* Estilos da Sanfona de Alunos na Agenda */
+        .sanfona-item {
+            background: white;
+            border: 1px solid #e0e0e0;
             border-radius: 6px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
         }
 
-        summary:hover {
-            background: #e9ecef;
+        .sanfona-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .sanfona-header:hover {
+            background-color: #edf2f7;
+        }
+
+        .sanfona-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge-pacote {
+            background-color: #4a7c59;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .sanfona-content {
+            display: none;
+            padding: 15px;
+            border-top: 1px solid #e0e0e0;
+            background-color: #ffffff;
+        }
+
+        .sanfona-content.ativo {
+            display: block;
         }
 
         .fc-toolbar-title {
@@ -442,7 +482,7 @@
             border-radius: 6px;
             font-size: 14px;
             resize: vertical;
-            margin-top: 15px;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -508,12 +548,15 @@
                 </div>
 
                 <div class="dash-widget">
-                    <details>
-                        <summary>📓 Diário de Anotações Rápidas</summary>
-                        <textarea id="diarioAnotacoes" class="diario-textarea"
-                            placeholder="Escreva suas anotações, recados ou lembretes do dia aqui..."
-                            oninput="salvarDiario()"></textarea>
-                    </details>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <h3 style="margin: 0;">📓 Diário de Anotações</h3>
+                        <button type="button" class="btn-salvar" style="padding: 6px 12px; font-size: 12px;"
+                            onclick="abrirModalDiario()">➕ Novo Diário</button>
+                    </div>
+                    <p style="color: #666; font-size: 13px; margin-bottom: 10px;">Anotações diárias e recados.</p>
+                    <div id="lista-diario-dashboard" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                        <!-- Anotações inseridas dinamicamente -->
+                    </div>
                 </div>
             </div>
         </section>
@@ -667,27 +710,11 @@
 
             <div class="table-container">
                 <div class="table-header-flex">
-                    <h3>Relatório/Listagem de Agendamentos</h3>
-                    <button class="btn-perigo" type="button" onclick="excluirSelecionados()">🗑️ Excluir
-                        Selecionados</button>
+                    <h3>Relatório de Agendamentos por Aluno (Pacotes)</h3>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 40px; text-align: center;">
-                                <input type="checkbox" id="chk-selecionar-todos"
-                                    onchange="selecionarTodosAgendamentos(this)">
-                            </th>
-                            <th>Matrícula Aluno</th>
-                            <th>Data</th>
-                            <th>Hora</th>
-                            <th style="text-align: center;">Status</th>
-                            <th>Observação</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-agendamentos"></tbody>
-                </table>
+                <div id="container-sanfona-agendamentos">
+                    <p style="color: #666; font-size: 14px; text-align: center; padding: 20px;">Nenhum agendamento encontrado.</p>
+                </div>
             </div>
         </section>
 
@@ -836,6 +863,26 @@
         </div>
     </div>
 
+    <!-- MODAL PARA CRIAR/EDITAR DIÁRIO -->
+    <div id="modalDiario" class="modal-overlay">
+        <div class="modal-card">
+            <h3 id="modal-diario-titulo">Nova Anotação no Diário</h3>
+            <input type="hidden" id="diario-edit-id">
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Data:</label>
+                <input type="date" id="diario-data" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Anotação:</label>
+                <textarea id="diario-texto" class="diario-textarea" placeholder="Escreva sua anotação do dia aqui..."></textarea>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancelar" style="display:inline-block;" onclick="fecharModais()">Cancelar</button>
+                <button type="button" class="btn-salvar" onclick="salvarDiarioEntryModal()">Salvar Anotação</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         let meuGraficoPizza = null;
         let calendarDash = null;
@@ -889,15 +936,104 @@
             }
         }
 
-        function salvarDiario() {
-            const texto = document.getElementById('diarioAnotacoes').value;
-            localStorage.setItem('projeto_reforco_diario', texto);
+        // Funções do Diário de Anotações por Dia
+        function carregarDiario() {
+            const salvo = localStorage.getItem('projeto_reforco_diario_lista');
+            let lista = salvo ? JSON.parse(salvo) : [];
+            
+            // Ordenar por data decrescente (mais recente primeiro)
+            lista.sort((a, b) => new Date(b.data) - new Date(a.data));
+
+            const container = document.getElementById('lista-diario-dashboard');
+            if (!container) return;
+
+            if (lista.length === 0) {
+                container.innerHTML = `<p style="color: #888; font-size: 13px; text-align: center; padding: 15px;">Nenhuma anotação no diário.</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            lista.forEach(item => {
+                let dataFormatada = item.data;
+                if (item.data && item.data.includes("-")) {
+                    const partes = item.data.split("-");
+                    dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                }
+
+                const card = document.createElement('div');
+                card.style.cssText = "background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 6px; padding: 10px; font-size: 13px;";
+                card.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">
+                        <strong style="color: #4a7c59;">📅 ${dataFormatada}</strong>
+                        <div style="display: flex; gap: 6px;">
+                            <button onclick="abrirModalDiario('${item.id}')" style="background:none; border:none; cursor:pointer; font-size:14px;" title="Editar">✏️</button>
+                            <button onclick="excluirDiario('${item.id}')" style="background:none; border:none; cursor:pointer; font-size:14px;" title="Excluir">🗑️</button>
+                        </div>
+                    </div>
+                    <p style="color: #333; white-space: pre-wrap; word-break: break-word;">${item.texto}</p>
+                `;
+                container.appendChild(card);
+            });
         }
 
-        function carregarDiario() {
-            const salvo = localStorage.getItem('projeto_reforco_diario');
-            if (salvo) {
-                document.getElementById('diarioAnotacoes').value = salvo;
+        function abrirModalDiario(id = null) {
+            document.getElementById('diario-edit-id').value = '';
+            document.getElementById('diario-texto').value = '';
+            
+            if (id) {
+                const salvo = localStorage.getItem('projeto_reforco_diario_lista');
+                const lista = salvo ? JSON.parse(salvo) : [];
+                const item = lista.find(d => d.id === id);
+                if (item) {
+                    document.getElementById('diario-edit-id').value = item.id;
+                    document.getElementById('diario-data').value = item.data;
+                    document.getElementById('diario-texto').value = item.texto;
+                    document.getElementById('modal-diario-titulo').innerText = 'Editar Anotação';
+                }
+            } else {
+                const hoje = new Date().toISOString().split('T')[0];
+                document.getElementById('diario-data').value = hoje;
+                document.getElementById('modal-diario-titulo').innerText = 'Nova Anotação no Diário';
+            }
+            document.getElementById('modalDiario').style.display = 'flex';
+        }
+
+        function salvarDiarioEntryModal() {
+            const id = document.getElementById('diario-edit-id').value;
+            const data = document.getElementById('diario-data').value;
+            const texto = document.getElementById('diario-texto').value;
+
+            if (!data || !texto.trim()) {
+                alert("Preencha a data e o texto da anotação.");
+                return;
+            }
+
+            const salvo = localStorage.getItem('projeto_reforco_diario_lista');
+            let lista = salvo ? JSON.parse(salvo) : [];
+
+            if (id) {
+                const index = lista.findIndex(d => d.id === id);
+                if (index !== -1) {
+                    lista[index].data = data;
+                    lista[index].texto = texto;
+                }
+            } else {
+                const novoId = 'DIARIO-' + Date.now();
+                lista.push({ id: novoId, data: data, texto: texto });
+            }
+
+            localStorage.setItem('projeto_reforco_diario_lista', JSON.stringify(lista));
+            fecharModais();
+            carregarDiario();
+        }
+
+        function excluirDiario(id) {
+            if (confirm("Deseja realmente excluir esta anotação do diário?")) {
+                const salvo = localStorage.getItem('projeto_reforco_diario_lista');
+                let lista = salvo ? JSON.parse(salvo) : [];
+                lista = lista.filter(d => d.id !== id);
+                localStorage.setItem('projeto_reforco_diario_lista', JSON.stringify(lista));
+                carregarDiario();
             }
         }
 
@@ -941,6 +1077,11 @@
                 const resposta = await fetch('/api/alunos');
                 alunosCache = await resposta.json();
 
+                alunosMap = {};
+                alunosCache.forEach(aluno => {
+                    alunosMap[aluno.matricula] = aluno.nome;
+                });
+
                 renderizarTabelaAlunos(alunosCache);
                 atualizarSelectsModal();
 
@@ -962,8 +1103,6 @@
                 };
 
                 alunosCache.forEach(aluno => {
-                    alunosMap[aluno.matricula] = aluno.nome;
-
                     if (aluno.nivelLeitura === 'ORTOGRAFICA' || aluno.nivelLeitura === 'ALFABETICA') {
                         alfabetizadosCount++;
                     }
@@ -1163,60 +1302,121 @@
             try {
                 const res = await fetch("/api/agendamentos");
                 agendamentosCache = await res.json();
-                const tbody = document.getElementById("tabela-agendamentos");
-                if (tbody) tbody.innerHTML = "";
+                
+                const containerSanfona = document.getElementById("container-sanfona-agendamentos");
+                if (containerSanfona) containerSanfona.innerHTML = "";
 
                 const eventosCalendario = [];
+                const agendamentosPorAluno = {};
 
                 agendamentosCache.forEach(a => {
-                    let dataFormatada = a.data;
-                    if (a.data && a.data.includes("-")) {
-                        const partes = a.data.split("-");
-                        dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                    if (!agendamentosPorAluno[a.matriculaAluno]) {
+                        agendamentosPorAluno[a.matriculaAluno] = [];
                     }
-
-                    const nomeAluno = alunosMap[a.matriculaAluno] || 'Aluno';
-                    const textoStatus = a.pago ? 'PAGO' : 'PENDENTE';
-                    const corStatus = a.pago ? '#27ae60' : '#c0392b';
-                    const tituloStatus = a.pago ? 'Pago (Clique para alterar)' : 'Pendente (Clique para alterar)';
-
-                    if (tbody) {
-                        tbody.innerHTML += `
-                            <tr>
-                                <td style="text-align: center;">
-                                    <input type="checkbox" class="chk-item-agenda" value="${a.id}">
-                                </td>
-                                <td>${nomeAluno}</td>
-                                <td>${dataFormatada}</td>
-                                <td>${a.hora}</td>
-                                <td style="text-align: center;">
-                                    <button type="button" class="btn-status-aula" style="color: white; background-color: ${corStatus};" onclick="alternarStatusAula('${a.id}')" title="${tituloStatus}">${textoStatus}</button>
-                                </td>
-                                <td>${a.observacao}</td>
-                                <td>
-                                    <button onclick="abrirModalDetalhe('${a.id}')" style="background:none; border:none; cursor:pointer;" title="Gerenciar">⚙️</button>
-                                </td>
-                            </tr>
-                        `;
-                    }
+                    agendamentosPorAluno[a.matriculaAluno].push(a);
 
                     eventosCalendario.push({
                         id: a.id,
-                        title: `${a.hora} ${nomeAluno}`,
+                        title: `${a.hora} ${alunosMap[a.matriculaAluno] || 'Aluno'}`,
                         start: `${a.data}T${a.hora}:00`,
                         backgroundColor: '#4a7c59'
                     });
                 });
 
+                const matriculas = Object.keys(agendamentosPorAluno);
+
+                if (matriculas.length === 0) {
+                    if (containerSanfona) {
+                        containerSanfona.innerHTML = `<p style="color: #666; font-size: 14px; text-align: center; padding: 20px;">Nenhum agendamento encontrado.</p>`;
+                    }
+                } else {
+                    matriculas.forEach((mat, index) => {
+                        const listaAulas = agendamentosPorAluno[mat];
+                        const nomeAluno = alunosMap[mat] || mat;
+                        const totalAulas = listaAulas.length;
+                        const aulasRealizadas = listaAulas.filter(a => a.pago).length;
+
+                        const sanfonaItem = document.createElement('div');
+                        sanfonaItem.className = 'sanfona-item';
+
+                        let linhasTabelaAulas = '';
+                        listaAulas.forEach((a, idx) => {
+                            let dataFormatada = a.data;
+                            if (a.data && a.data.includes("-")) {
+                                const partes = a.data.split("-");
+                                dataFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                            }
+
+                            const textoStatus = a.pago ? 'PAGO' : 'PENDENTE';
+                            const corStatus = a.pago ? '#27ae60' : '#c0392b';
+                            const tituloStatus = a.pago ? 'Pago (Clique para alterar)' : 'Pendente (Clique para alterar)';
+                            const numAulaFormatado = `Aula ${idx + 1}/${totalAulas}`;
+
+                            linhasTabelaAulas += `
+                                <tr>
+                                    <td>${dataFormatada}</td>
+                                    <td>${a.hora}</td>
+                                    <td style="text-align: center;">
+                                        <button type="button" class="btn-status-aula" style="color: white; background-color: ${corStatus};" onclick="alternarStatusAula('${a.id}')" title="${tituloStatus}">${textoStatus}</button>
+                                    </td>
+                                    <td>${a.observacao || numAulaFormatado} (${numAulaFormatado})</td>
+                                    <td style="text-align: right;">
+                                        <button onclick="abrirModalDetalhe('${a.id}')" style="background:none; border:none; cursor:pointer;" title="Gerenciar">⚙️</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+
+                        sanfonaItem.innerHTML = `
+                            <div class="sanfona-header" onclick="toggleSanfona(this)">
+                                <div class="sanfona-title">
+                                    <span>▼</span>
+                                    <span>👨‍🎓 ${nomeAluno}</span>
+                                </div>
+                                <div class="badge-pacote">
+                                    Pacote Mensal [${aulasRealizadas}/${totalAulas}]
+                                </div>
+                            </div>
+                            <div class="sanfona-content" id="conteudo-sanfona-${index}">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Hora</th>
+                                            <th style="text-align: center;">Status</th>
+                                            <th>Observação / Progresso</th>
+                                            <th style="text-align: right;">Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${linhasTabelaAulas}
+                                    </tbody>
+                                </table>
+                            </div>
+                        `;
+
+                        containerSanfona.appendChild(sanfonaItem);
+                    });
+                }
+
                 ultimosEventosCache = eventosCalendario;
-
-                const chkTodos = document.getElementById('chk-selecionar-todos');
-                if (chkTodos) chkTodos.checked = false;
-
                 inicializarCalendarios(eventosCalendario);
 
             } catch (err) {
                 console.error("Erro ao carregar agendamentos:", err);
+            }
+        }
+
+        function toggleSanfona(headerEl) {
+            const contentEl = headerEl.nextElementSibling;
+            const setaEl = headerEl.querySelector('.sanfona-title span');
+            
+            if (contentEl.classList.contains('ativo')) {
+                contentEl.classList.remove('ativo');
+                setaEl.innerText = '▼';
+            } else {
+                contentEl.classList.add('ativo');
+                setaEl.innerText = '▲';
             }
         }
 
@@ -1247,31 +1447,6 @@
 
         async function alternarStatusDoDashboard(id) {
             await alternarStatusAula(id);
-        }
-
-        function selecionarTodosAgendamentos(masterChk) {
-            document.querySelectorAll('.chk-item-agenda').forEach(chk => {
-                chk.checked = masterChk.checked;
-            });
-        }
-
-        async function excluirSelecionados() {
-            const selecionados = Array.from(document.querySelectorAll('.chk-item-agenda:checked')).map(cb => cb.value);
-
-            if (selecionados.length === 0) {
-                alert("Selecione ao menos um agendamento marcando a caixinha na tabela.");
-                return;
-            }
-
-            if (confirm(`Tem certeza que deseja excluir os ${selecionados.length} agendamentos selecionados?`)) {
-                await fetch("/api/agendamentos", {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(selecionados)
-                });
-                await carregarTabelaEAgenda();
-                navegar('agenda');
-            }
         }
 
         function inicializarCalendarios(eventos) {
@@ -1427,11 +1602,13 @@
                 dataAtual.setDate(dataAtual.getDate() + 1);
             }
 
-            await fetch("/api/agendamentos", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(listaAgendamentos)
-            });
+            for (const ag of listaAgendamentos) {
+                await fetch("/api/agendamentos", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(ag)
+                });
+            }
 
             fecharModais();
             await carregarTabelaEAgenda();
@@ -1548,11 +1725,15 @@
             .catch(error => console.error('Erro:', error));
         }
 
-        // Execução inicial ao abrir a página
-        carregarAlunos();
-        carregarTabelaEAgenda();
-        carregarDiario();
-        carregarFinanceiro();
+        // Execução inicial sequencial garantida
+        async function inicializarSistema() {
+            await carregarAlunos();
+            await carregarTabelaEAgenda();
+            carregarDiario();
+            carregarFinanceiro();
+        }
+
+        inicializarSistema();
     </script>
 </body>
 

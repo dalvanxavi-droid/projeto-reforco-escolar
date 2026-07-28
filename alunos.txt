@@ -1,1 +1,2 @@
-João Mateus;25/09/2023;Nível III;GARATUJA;false;;Lidiane Karla;84 9 9204-1933;Av Poços de Caldas, 1875;ATRASADO;600.0;MENSAL
+Benicio Marques;17/12/2019;2o Ano;ALFABETICA;false;;Naiara Medeiros ;84 9 9201-2992;Resid. Parque Morumbi, 2000, COOPAB;PENDENTE;1280.0;MENSAL
+Maria Isabel;25/09/2021;Nível IV;SILABICA_COM_VALOR_SONORO;false;;Naiara Medeiros ;84 9 9201-2992;Resid. Parque Morumbi, 2000, COOPAB;PENDENTE;320.0;MENSAL

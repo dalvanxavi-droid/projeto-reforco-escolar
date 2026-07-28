@@ -55,7 +55,8 @@ public class ServidorWeb {
                         contadorDatas.put(dataBaseStr, seq);
                         String matriculaGerada = dataBaseStr + String.format("%03d", seq);
 
-                        // Montando o JSON com Locale.US para garantir o ponto decimal ao invés de vírgula
+                        // Montando o JSON com Locale.US para garantir o ponto decimal ao invés de
+                        // vírgula
                         json.append(String.format(java.util.Locale.US,
                                 "{\"matricula\":\"%s\",\"nome\":\"%s\",\"dataNascimento\":\"%s\",\"anoEscolar\":\"%s\",\"nivelLeitura\":\"%s\",\"temNecessidade\":%b,\"descricaoNecessidade\":\"%s\",\"responsavelNome\":\"%s\",\"responsavelTelefone\":\"%s\",\"responsavelEndereco\":\"%s\",\"statusPagamento\":\"%s\",\"statusPagamentoDesc\":\"%s\",\"valorContrato\":%.2f,\"cicloPagamento\":\"%s\"}",
                                 matriculaGerada, a.getNome(), a.getDataNascimento(), a.getAnoEscolar(),
@@ -63,7 +64,8 @@ public class ServidorWeb {
                                 a.isTemNecessidadeEspecial(),
                                 a.getDescricaoNecessidade() != null ? a.getDescricaoNecessidade() : "", respNome,
                                 respFone, respEnd, statusPag, statusPagDesc,
-                                a.getValorContrato(), a.getCicloPagamento() != null ? a.getCicloPagamento() : "MENSAL"));
+                                a.getValorContrato(),
+                                a.getCicloPagamento() != null ? a.getCicloPagamento() : "MENSAL"));
 
                         if (i < alunos.size() - 1)
                             json.append(",");
@@ -96,9 +98,11 @@ public class ServidorWeb {
 
                     // Lendo valores financeiros vindos da requisição (com fallback seguro)
                     String valorStr = extrairValorJson(body, "valorContrato");
-                    double valorContrato = (valorStr != null && !valorStr.isEmpty()) ? Double.parseDouble(valorStr) : 1800.0;
+                    double valorContrato = (valorStr != null && !valorStr.isEmpty()) ? Double.parseDouble(valorStr)
+                            : 1800.0;
                     String cicloPagamento = extrairValorJson(body, "cicloPagamento");
-                    if (cicloPagamento == null || cicloPagamento.isEmpty()) cicloPagamento = "MENSAL";
+                    if (cicloPagamento == null || cicloPagamento.isEmpty())
+                        cicloPagamento = "MENSAL";
 
                     alunos.add(new Aluno(nome, dataNasc, anoEscolar, resp, nivel, temNecessidade, descNee,
                             StatusPagamento.PENDENTE, valorContrato, cicloPagamento));
@@ -123,7 +127,8 @@ public class ServidorWeb {
                             a.setDataNascimento(LocalDate.parse(extrairValorJson(body, "dataNascimento")));
                             a.setAnoEscolar(extrairValorJson(body, "anoEscolar"));
                             a.setNivelLeitura(NivelLeitura.valueOf(extrairValorJson(body, "nivelLeitura")));
-                            a.setTemNecessidadeEspecial(Boolean.parseBoolean(extrairValorJson(body, "temNecessidadeEspecial")));
+                            a.setTemNecessidadeEspecial(
+                                    Boolean.parseBoolean(extrairValorJson(body, "temNecessidadeEspecial")));
                             a.setDescricaoNecessidade(extrairValorJson(body, "descricaoNecessidade"));
 
                             String nomeResp = extrairValorJson(body, "nomeResponsavel");
@@ -162,13 +167,14 @@ public class ServidorWeb {
 
                     java.util.Map<String, Integer> contadorDatas = new java.util.HashMap<>();
                     java.util.Iterator<Aluno> iterator = alunos.iterator();
-                    
+
                     while (iterator.hasNext()) {
                         Aluno a = iterator.next();
-                        
+
                         String dataBaseStr = "00000000";
                         if (a.getDataNascimento() != null) {
-                            dataBaseStr = a.getDataNascimento().format(java.time.format.DateTimeFormatter.ofPattern("ddMMyyyy"));
+                            dataBaseStr = a.getDataNascimento()
+                                    .format(java.time.format.DateTimeFormatter.ofPattern("ddMMyyyy"));
                         }
                         int seq = contadorDatas.getOrDefault(dataBaseStr, 0) + 1;
                         contadorDatas.put(dataBaseStr, seq);
@@ -234,6 +240,26 @@ public class ServidorWeb {
                     String data = extrairValorJson(body, "data");
                     String hora = extrairValorJson(body, "hora");
                     String obs = extrairValorJson(body, "observacao");
+
+                    // Validação para impedir choque de horário
+                    boolean conflito = false;
+                    for (Agendamento a : agendamentos) {
+                        if (a.getData().toString().equals(data) && a.getHora().equals(hora)) {
+                            conflito = true;
+                            break;
+                        }
+                    }
+
+                    if (conflito) {
+                        String response = "{\"erro\":\"Conflito de horario\"}";
+                        exchange.getResponseHeaders().add("Content-Type", "application/json; charset=UTF-8");
+                        exchange.sendResponseHeaders(409, response.getBytes(StandardCharsets.UTF_8).length);
+                        OutputStream os = exchange.getResponseBody();
+                        os.write(response.getBytes(StandardCharsets.UTF_8));
+                        os.close();
+                        return;
+                    }
+
                     String id = "AG-" + System.currentTimeMillis();
 
                     Agendamento novo = new Agendamento(id, matricula, LocalDate.parse(data), hora, false, obs);
@@ -247,7 +273,6 @@ public class ServidorWeb {
                     os.write(response.getBytes(StandardCharsets.UTF_8));
                     os.close();
                 }
-
                 if ("PUT".equalsIgnoreCase(exchange.getRequestMethod())) {
                     InputStream is = exchange.getRequestBody();
                     String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
