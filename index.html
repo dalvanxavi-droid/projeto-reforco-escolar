@@ -1123,15 +1123,7 @@
             let aluno = alunosCache.find(a => String(a.matricula || '').trim() === matStr);
             if (aluno) return aluno.nome;
 
-            const seqStr = matStr.slice(-3);
-            const indexSeq = parseInt(seqStr, 10) - 1;
-            if (!isNaN(indexSeq) && alunosCache[indexSeq]) {
-                return alunosCache[indexSeq].nome;
-            }
-
-            if (alunosCache.length === 1) return alunosCache[0].nome;
-
-            return alunosMap[matStr] || matricula;
+            return alunosMap[matStr] || 'Aluno Desconhecido';
         }
 
         function navegar(tela) {
@@ -1603,20 +1595,44 @@
             if (!mat || !inicio || dias.length === 0) return alert("Preencha todos os campos e selecione os dias.");
 
             let cur = new Date(inicio + 'T00:00:00');
+            let datasParaCriar = [];
             let criadas = 0;
+
             while (criadas < qtd) {
                 if (dias.includes(cur.getDay())) {
                     criadas++;
-                    await fetch("/api/agendamentos", {
-                        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-                            matriculaAluno: mat, data: cur.toISOString().split('T')[0], hora, observacao: `Pacote (${criadas}/${qtd})`
-                        })
-                    });
+                    datasParaCriar.push(cur.toISOString().split('T')[0]);
                 }
                 cur.setDate(cur.getDate() + 1);
             }
+
+            // Validação prévia: verifica se algum dia já está ocupado antes de criar qualquer aula
+            for (let dataStr of datasParaCriar) {
+                const conflito = agendamentosCache.some(a => a.data === dataStr && a.hora === hora);
+                if (conflito) {
+                    const dataFmt = dataStr.split('-').reverse().join('/');
+                    alert(`Não é possível gerar o pacote. O horário de ${hora} no dia ${dataFmt} já possui um aluno agendado.`);
+                    return;
+                }
+            }
+
+            // Se passou por todas as validações sem conflito, cria o pacote completo
+            for (let i = 0; i < datasParaCriar.length; i++) {
+                await fetch("/api/agendamentos", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        matriculaAluno: mat,
+                        data: datasParaCriar[i],
+                        hora,
+                        observacao: `Pacote (${i + 1}/${datasParaCriar.length})`
+                    })
+                });
+            }
+
             fecharModais();
             await carregarTabelaEAgenda();
+            alert("Pacote gerado com sucesso!");
         }
 
         function abrirModalDetalhe(id) {

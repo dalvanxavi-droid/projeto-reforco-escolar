@@ -35,7 +35,6 @@ public class ServidorWeb {
                 }
 
                 if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-                    // Ordena alfabeticamente para garantir que a matrícula nunca mude de lugar
                     List<Aluno> alunosOrdenados = new ArrayList<>(alunos);
                     alunosOrdenados.sort(java.util.Comparator.comparing(Aluno::getNome, String.CASE_INSENSITIVE_ORDER));
 
@@ -98,7 +97,6 @@ public class ServidorWeb {
                     Responsavel resp = new Responsavel(nomeResp, foneResp, endResp);
                     String descNee = extrairValorJson(body, "descricaoNecessidade");
 
-                    // Lendo valores financeiros vindos da requisição (com fallback seguro)
                     String valorStr = extrairValorJson(body, "valorContrato");
                     double valorContrato = (valorStr != null && !valorStr.isEmpty()) ? Double.parseDouble(valorStr)
                             : 1800.0;
@@ -138,7 +136,6 @@ public class ServidorWeb {
                             String endResp = extrairValorJson(body, "enderecoResponsavel");
                             a.setResponsavel(new Responsavel(nomeResp, foneResp, endResp));
 
-                            // Atualizando dados financeiros se enviados na edição
                             String valorStr = extrairValorJson(body, "valorContrato");
                             if (valorStr != null && !valorStr.isEmpty()) {
                                 a.setValorContrato(Double.parseDouble(valorStr));
@@ -162,7 +159,7 @@ public class ServidorWeb {
                     os.close();
                 }
 
-               if ("DELETE".equalsIgnoreCase(exchange.getRequestMethod())) {
+                if ("DELETE".equalsIgnoreCase(exchange.getRequestMethod())) {
                     InputStream is = exchange.getRequestBody();
                     String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
                     String matricula = extrairValorJson(body, "matricula");
@@ -172,6 +169,7 @@ public class ServidorWeb {
 
                     java.util.Map<String, Integer> contadorDatas = new java.util.HashMap<>();
                     Aluno alunoParaRemover = null;
+                    String matriculaAlvo = null;
 
                     for (Aluno a : alunosOrdenados) {
                         String dataBaseStr = "00000000";
@@ -185,12 +183,16 @@ public class ServidorWeb {
 
                         if (matriculaGerada.equals(matricula.trim())) {
                             alunoParaRemover = a;
+                            matriculaAlvo = matriculaGerada;
                             break;
                         }
                     }
 
                     if (alunoParaRemover != null) {
                         alunos.remove(alunoParaRemover);
+                        final String alvoFinal = matriculaAlvo;
+                        agendamentos.removeIf(ag -> ag.getMatriculaAluno().equals(alvoFinal));
+                        GerenciadorArquivo.salvarAgendamentos(agendamentos);
                     }
 
                     GerenciadorArquivo.salvarAlunos(new ArrayList<>(alunos));
@@ -248,7 +250,6 @@ public class ServidorWeb {
                     String hora = extrairValorJson(body, "hora");
                     String obs = extrairValorJson(body, "observacao");
 
-                    // Validação para impedir choque de horário
                     boolean conflito = false;
                     for (Agendamento a : agendamentos) {
                         if (a.getData().toString().equals(data) && a.getHora().equals(hora)) {
@@ -310,18 +311,41 @@ public class ServidorWeb {
                 }
 
                 if ("DELETE".equalsIgnoreCase(exchange.getRequestMethod())) {
-                    InputStream is = exchange.getRequestBody();
-                    String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-
-                    if (body.startsWith("[")) {
-                        body = body.replace("[", "").replace("]", "").replace("\"", "");
-                        String[] ids = body.split(",");
-                        for (String id : ids) {
-                            agendamentos.removeIf(a -> a.getId().trim().equals(id.trim()));
+                    String query = exchange.getRequestURI().getQuery();
+                    String tempId = null;
+                    if (query != null) {
+                        for (String param : query.split("&")) {
+                            String[] par = param.split("=");
+                            if (par.length == 2 && par[0].equals("id")) {
+                                try {
+                                    tempId = java.net.URLDecoder.decode(par[1], "UTF-8");
+                                } catch (Exception e) {
+                                    tempId = par[1];
+                                }
+                            }
                         }
+                    }
+                    final String idParam = tempId;
+
+                    if (idParam != null && !idParam.isEmpty()) {
+                        agendamentos.removeIf(a -> a.getId().equals(idParam));
                     } else {
-                        String id = extrairValorJson(body, "id");
-                        agendamentos.removeIf(a -> a.getId().equals(id));
+                        InputStream is = exchange.getRequestBody();
+                        String body = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+                        if (body.startsWith("[")) {
+                            body = body.replace("[", "").replace("]", "").replace("\"", "");
+                            String[] ids = body.split(",");
+                            for (String idItem : ids) {
+                                final String targetId = idItem.trim();
+                                agendamentos.removeIf(a -> a.getId().trim().equals(targetId));
+                            }
+                        } else if (!body.isEmpty()) {
+                            String id = extrairValorJson(body, "id");
+                            if (id != null && !id.isEmpty()) {
+                                final String targetId = id;
+                                agendamentos.removeIf(a -> a.getId().equals(targetId));
+                            }
+                        }
                     }
                     GerenciadorArquivo.salvarAgendamentos(agendamentos);
 
