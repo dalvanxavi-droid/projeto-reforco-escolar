@@ -911,6 +911,7 @@
             <div class="table-container">
                 <div class="table-header-flex">
                     <h3 style="color: var(--cor-primaria);">Pacotes e Aulas por Aluno</h3>
+                    <button class="btn-perigo" onclick="excluirSelecionados()">🗑️ Excluir Selecionados</button>
                 </div>
                 <div id="container-sanfona-agendamentos">
                     <p style="color: var(--texto-secundario); font-size: 13px; text-align: center; padding: 20px;">
@@ -1484,6 +1485,7 @@
                             lista.forEach((a, i) => {
                                 linhas += `
                                     <tr>
+                                        <td><input type="checkbox" class="chk-agendamento" value="${a.id}"></td>
                                         <td>${a.data}</td>
                                         <td>${a.hora}</td>
                                         <td><button class="btn-salvar" style="padding:3px 8px; font-size:11px; background:${a.pago ? '#52b788' : '#e07a5f'}" onclick="alternarStatusAula('${a.id}')">${a.pago ? 'PAGO' : 'PENDENTE'}</button></td>
@@ -1503,7 +1505,7 @@
                                 </div>
                                 <div class="sanfona-content ${abertos.includes(mat) ? 'ativo' : ''}">
                                     <table>
-                                        <thead><tr><th>Data</th><th>Hora</th><th>Status</th><th>Obs</th><th>Ações</th></tr></thead>
+                                        <thead><tr><th style="width:30px;"><input type="checkbox" onclick="toggleSelecionarTodos(this, '${mat}')"></th><th>Data</th><th>Hora</th><th>Status</th><th>Obs</th><th>Ações</th></tr></thead>
                                         <tbody>${linhas}</tbody>
                                     </table>
                                 </div>
@@ -1522,6 +1524,29 @@
 
                 inicializarCalendarios(ultimosEventosCache);
             } catch (err) { console.error(err); }
+        }
+
+        function toggleSelecionarTodos(masterChk, matricula) {
+            const item = document.querySelector(`.sanfona-item[data-matricula="${matricula}"]`);
+            if (!item) return;
+            const checkboxes = item.querySelectorAll('.chk-agendamento');
+            checkboxes.forEach(cb => cb.checked = masterChk.checked);
+        }
+
+        async function excluirSelecionados() {
+            const selecionados = Array.from(document.querySelectorAll('.chk-agendamento:checked')).map(cb => cb.value);
+            if (selecionados.length === 0) {
+                alert("Selecione pelo menos um agendamento para excluir.");
+                return;
+            }
+            if (confirm(`Deseja excluir ${selecionados.length} agendamento(s) selecionado(s)?`)) {
+                await fetch("/api/agendamentos", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(selecionados)
+                });
+                await carregarTabelaEAgenda();
+            }
         }
 
         async function alternarStatusAula(id) {
@@ -1606,7 +1631,6 @@
                 cur.setDate(cur.getDate() + 1);
             }
 
-            // Validação prévia: verifica se algum dia já está ocupado antes de criar qualquer aula
             for (let dataStr of datasParaCriar) {
                 const conflito = agendamentosCache.some(a => a.data === dataStr && a.hora === hora);
                 if (conflito) {
@@ -1616,7 +1640,6 @@
                 }
             }
 
-            // Se passou por todas as validações sem conflito, cria o pacote completo
             for (let i = 0; i < datasParaCriar.length; i++) {
                 await fetch("/api/agendamentos", {
                     method: "POST",
