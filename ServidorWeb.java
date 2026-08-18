@@ -24,6 +24,14 @@ public class ServidorWeb {
     private static List<Agendamento> agendamentos = GerenciadorArquivo.carregarAgendamentos();
 
     public static void main(String[] args) throws IOException {
+        // === DIAGNÓSTICO: verificar variáveis de ambiente ===
+        System.out.println("=== DIAGNÓSTICO DE VARIÁVEIS DE AMBIENTE ===");
+        System.out.println("DB_URL: [" + System.getenv("DB_URL") + "]");
+        System.out.println("DB_USER: [" + System.getenv("DB_USER") + "]");
+        System.out.println("DB_PASSWORD: [" + (System.getenv("DB_PASSWORD") != null ? "DEFINIDA" : "NULL") + "]");
+        System.out.println("Todas as env vars: " + System.getenv().keySet());
+        System.out.println("============================================");
+
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 
         // ROTA API: ALUNOS
