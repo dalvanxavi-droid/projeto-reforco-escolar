@@ -5,9 +5,9 @@ import java.util.List;
 
 public class GerenciadorArquivo {
 
-    private static final String URL = System.getenv("DB_URL");
-    private static final String USER = System.getenv("DB_USER");
-    private static final String PASS = System.getenv("DB_PASSWORD");
+    private static final String URL = System.getenv("DB_URL") != null ? System.getenv("DB_URL") : "jdbc:postgresql://ep-ancient-firefly-acu5eu72-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require";
+    private static final String USER = System.getenv("DB_USER") != null ? System.getenv("DB_USER") : "neondb_owner";
+    private static final String PASS = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "npg_u1mvD7iLczJx";
 
     private static Connection conectar() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);
