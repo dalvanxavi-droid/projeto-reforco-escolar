@@ -10,8 +10,10 @@ public class Aluno {
     private boolean temNecessidadeEspecial;
     private String descricaoNecessidade;
     private StatusPagamento statusPagamento;
+    private String matricula;
     private double valorContrato;
     private String cicloPagamento;
+    
 
     public Aluno() {}
 
@@ -31,6 +33,9 @@ public class Aluno {
     }
 
 // Getters e Setters essenciais
+  public String getMatricula() { return matricula; }
+    public void setMatricula(String matricula) { this.matricula = matricula; }
+
     public double getValorContrato() { return valorContrato; }
     public void setValorContrato(double valorContrato) { this.valorContrato = valorContrato; }
 

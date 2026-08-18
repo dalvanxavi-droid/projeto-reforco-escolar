@@ -1,0 +1,11 @@
+# Arquivos compilados Java
+*.class
+
+# Driver JDBC (muito grande pro repositório)
+*.jar
+
+# Arquivos de sistema
+.DS_Store
+
+# Variáveis de ambiente (senhas)
+.env

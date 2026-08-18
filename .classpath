@@ -1,0 +1,7 @@
+<classpath>
+    <classpathentry kind="src" path="."/>
+    <classpathentry kind="lib" path="lib/gson-2.11.0.jar"/>
+    <classpathentry kind="lib" path="postgresql-42.7.3.jar"/>
+    <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+    <classpathentry kind="output" path="bin"/>
+</classpath>
