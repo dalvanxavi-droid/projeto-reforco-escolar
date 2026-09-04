@@ -1522,8 +1522,11 @@
                     id: a.id,
                     title: `${a.hora} ${obterNomeAluno(a.matriculaAluno)}`,
                     start: `${a.data}T${a.hora}:00`,
+                    // Usamos o 'realized' vindo do banco, mas permitimos override client-side
                     realized: a.realizada || false,
-                    backgroundColor: a.realizada || false ? '#28a745' : '#fd7e14'
+                    backgroundColor: a.realizada || false ? '#28a745' : '#fd7e14',
+                    // Armazena id do agendamento pra referência rápida
+                    agendamentoId: a.id
                 }));
 
                 inicializarCalendarios(ultimosEventosCache);
@@ -1577,19 +1580,28 @@
                         select: (info) => abrirModalNovo(info.startStr),
                         eventClick: (info) => {
                             const ev = info.event;
+                            // Inverte o estado atual
                             const novaRealizada = !ev.realized;
-                            // Atualiza o visual
+                            // Atualiza o visual imediatamente no calendário
                             ev.setProp('backgroundColor', novaRealizada ? '#28a745' : '#fd7e14');
                             ev.setProp('realized', novaRealizada);
                             // Título com ✅ ou ❌
                             const simbolo = novaRealizada ? '✅' : '❌';
                             ev.setProp('title', `${ev.title} ${simbolo}`);
-                            // Salva no banco
+                            // Salva no banco (PUT)
                             fetch("/api/agendamentos", {
                                 method: "PUT",
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({ id: ev.id, realizada: novaRealizada })
-                            }).then(() => carregarTabelaEAgenda());
+                            }).then(() => {
+                                // Após salvar no banco, atualiza o cache para garantir persistência
+                                // Busca o evento no cache pelo id e atualiza o realized
+                                ultimosEventosCache = ultimosEventosCache.map(e =>
+                                    e.id === ev.id ? { ...e, realized: novaRealizada, backgroundColor: novaRealizada ? '#28a745' : '#fd7e14' } : e
+                                );
+                                // Recarrega a tabela mas mantém o estado visual do calendário
+                                carregarTabelaEAgenda();
+                            });
                         },
                         selectable: true
                     });
