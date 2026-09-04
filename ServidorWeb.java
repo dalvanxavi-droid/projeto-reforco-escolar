@@ -159,28 +159,20 @@ public class ServidorWeb {
                 if ("DELETE".equalsIgnoreCase(exchange.getRequestMethod())) {
                     String body = lerBody(exchange);
                     JsonObject json = JsonParser.parseString(body).getAsJsonObject();
-                    String matricula = json.get("matricula").getAsString();
+                    String matriculaInput = json.get("matricula").getAsString();
 
-                    List<Aluno> alunosOrdenados = new ArrayList<>(alunos);
-                    alunosOrdenados.sort(java.util.Comparator.comparing(Aluno::getNome, String.CASE_INSENSITIVE_ORDER));
-
-                    Map<String, Integer> contadorDatas = new HashMap<>();
                     Aluno alunoParaRemover = null;
-                    String matriculaAlvo = null;
-
-                    for (Aluno a : alunosOrdenados) {
-                        String matriculaGerada = gerarMatricula(a, contadorDatas);
-                        if (matriculaGerada.equals(matricula.trim())) {
+                    for (Aluno a : alunos) {
+                        if (a.getMatricula().equals(matriculaInput)) {
                             alunoParaRemover = a;
-                            matriculaAlvo = matriculaGerada;
                             break;
                         }
                     }
 
                     if (alunoParaRemover != null) {
                         alunos.remove(alunoParaRemover);
-                        final String alvoFinal = matriculaAlvo;
-                        agendamentos.removeIf(ag -> ag.getMatriculaAluno().equals(alvoFinal));
+                        final String matriculaFinal = alunoParaRemover.getMatricula();
+                        agendamentos.removeIf(ag -> ag.getMatriculaAluno().equals(matriculaFinal));
                         GerenciadorArquivo.salvarAgendamentos(agendamentos);
                     }
 
