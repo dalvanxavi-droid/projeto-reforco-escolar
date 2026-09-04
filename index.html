@@ -1483,12 +1483,15 @@
 
                             let linhas = '';
                             lista.forEach((a, i) => {
+                                const realizadaStr = a.realizada ? '✅' : '❌';
+                                const realizadaBg = a.realizada ? '#28a745' : '#dc3545';
                                 linhas += `
                                     <tr>
                                         <td><input type="checkbox" class="chk-agendamento" value="${a.id}"></td>
                                         <td>${a.data}</td>
                                         <td>${a.hora}</td>
                                         <td><button class="btn-salvar" style="padding:3px 8px; font-size:11px; background:${a.pago ? '#52b788' : '#e07a5f'}" onclick="alternarStatusAula('${a.id}')">${a.pago ? 'PAGO' : 'PENDENTE'}</button></td>
+                                        <td><span style="color:${realizadaBg}; font-weight:600;">${realizadaStr}</span></td>
                                         <td>${a.observacao || 'Aula'} (${i + 1}/${total})</td>
                                         <td><button onclick="abrirModalDetalhe('${a.id}')" style="background:none;border:none;cursor:pointer;">⚙️</button></td>
                                     </tr>
@@ -1505,7 +1508,7 @@
                                 </div>
                                 <div class="sanfona-content ${abertos.includes(mat) ? 'ativo' : ''}">
                                     <table>
-                                        <thead><tr><th style="width:30px;"><input type="checkbox" onclick="toggleSelecionarTodos(this, '${mat}')"></th><th>Data</th><th>Hora</th><th>Status</th><th>Obs</th><th>Ações</th></tr></thead>
+                                        <thead><tr><th style="width:30px;"><input type="checkbox" onclick="toggleSelecionarTodos(this, '${mat}')"></th><th>Data</th><th>Hora</th><th>Status</th><th>Realizada</th><th>Obs</th><th>Ações</th></tr></thead>
                                         <tbody>${linhas}</tbody>
                                     </table>
                                 </div>
@@ -1519,7 +1522,8 @@
                     id: a.id,
                     title: `${a.hora} ${obterNomeAluno(a.matriculaAluno)}`,
                     start: `${a.data}T${a.hora}:00`,
-                    backgroundColor: '#285e43'
+                    realized: a.realizada || false,
+                    backgroundColor: a.realizada || false ? '#28a745' : '#fd7e14'
                 }));
 
                 inicializarCalendarios(ultimosEventosCache);
@@ -1571,7 +1575,22 @@
                         headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
                         events: eventos,
                         select: (info) => abrirModalNovo(info.startStr),
-                        eventClick: (info) => abrirModalDetalhe(info.event.id),
+                        eventClick: (info) => {
+                            const ev = info.event;
+                            const novaRealizada = !ev.realized;
+                            // Atualiza o visual
+                            ev.setProp('backgroundColor', novaRealizada ? '#28a745' : '#fd7e14');
+                            ev.setProp('realized', novaRealizada);
+                            // Título com ✅ ou ❌
+                            const simbolo = novaRealizada ? '✅' : '❌';
+                            ev.setProp('title', `${ev.title} ${simbolo}`);
+                            // Salva no banco
+                            fetch("/api/agendamentos", {
+                                method: "PUT",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ id: ev.id, realizada: novaRealizada })
+                            }).then(() => carregarTabelaEAgenda());
+                        },
                         selectable: true
                     });
                     cal.render();

@@ -11,7 +11,9 @@ public class Agendamento {
     private LocalDate data;
     private String hora;
     private boolean pago;
+    private boolean realizada;
     private String observacao;
+
 
     public Agendamento(String id, String matriculaAluno, LocalDate data, String hora, boolean pago, String observacao) {
         this.id = id;
@@ -19,6 +21,7 @@ public class Agendamento {
         this.data = data;
         this.hora = hora;
         this.pago = pago;
+        this.realizada = false;
         this.observacao = observacao;
     }
 
@@ -40,6 +43,10 @@ public class Agendamento {
 
     public boolean isPago() {
         return pago;
+    }
+
+    public boolean isRealizada(){
+        return realizada;
     }
 
     public String getObservacao() {
@@ -64,6 +71,10 @@ public class Agendamento {
 
     public void setPago(boolean pago) {
         this.pago = pago;
+    }
+
+    public void setRealizada(boolean realizada) {
+        this.realizada = realizada;
     }
 
     public void setObservacao(String observacao) {

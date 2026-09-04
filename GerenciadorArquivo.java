@@ -110,11 +110,11 @@ private static String gerarMatriculaBD(Aluno a, java.util.Map<String, Integer> c
     public static void salvarAgendamentos(List<Agendamento> lista) {
         // No modelo relacional, podemos salvar os agendamentos diretamente upserting na
         // tabela
-        String sqlUpsert = "INSERT INTO agendamentos (id, matricula_aluno, data, hora, pago, observacao) " +
-                "VALUES (?, ?, ?, ?, ?, ?) " +
+        String sqlUpsert = "INSERT INTO agendamentos (id, matricula_aluno, data, hora, pago, observacao, realizada) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?) " +
                 "ON CONFLICT (id) DO UPDATE SET " +
                 "matricula_aluno = EXCLUDED.matricula_aluno, data = EXCLUDED.data, hora = EXCLUDED.hora, " +
-                "pago = EXCLUDED.pago, observacao = EXCLUDED.observacao";
+                "pago = EXCLUDED.pago, observacao = EXCLUDED.observacao, realizada = EXCLUDED.realizada";
 
         try (Connection conn = conectar();
                 PreparedStatement stmt = conn.prepareStatement(sqlUpsert)) {
@@ -126,6 +126,7 @@ private static String gerarMatriculaBD(Aluno a, java.util.Map<String, Integer> c
                 stmt.setString(4, a.getHora());
                 stmt.setBoolean(5, a.isPago());
                 stmt.setString(6, a.getObservacao());
+                stmt.setBoolean(7, a.isRealizada());
                 stmt.addBatch();
             }
             stmt.executeBatch();
@@ -148,9 +149,11 @@ private static String gerarMatriculaBD(Aluno a, java.util.Map<String, Integer> c
                 LocalDate data = rs.getDate("data").toLocalDate();
                 String hora = rs.getString("hora");
                 boolean pago = rs.getBoolean("pago");
+                boolean realizada = rs.getBoolean("realizada");
                 String obs = rs.getString("observacao");
 
                 Agendamento a = new Agendamento(id, matricula, data, hora, pago, obs);
+                a.setRealizada(realizada);
                 lista.add(a);
             }
         } catch (SQLException e) {

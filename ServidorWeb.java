@@ -217,6 +217,7 @@ public class ServidorWeb {
                         item.put("hora", a.getHora());
                         item.put("pago", a.isPago());
                         item.put("observacao", a.getObservacao() != null ? a.getObservacao() : "");
+                        item.put("realizada", a.isRealizada());
                         listaJson.add(item);
                     }
                     enviarResposta(exchange, 200, gson.toJson(listaJson));
@@ -272,6 +273,8 @@ public class ServidorWeb {
                                 a.setHora(json.get("hora").getAsString());
                             if (json.has("pago"))
                                 a.setPago(json.get("pago").getAsBoolean());
+                            if (json.has("realizada"))
+                                a.setRealizada(json.get("realizada").getAsBoolean());
                             break;
                         }
                     }
