@@ -1581,13 +1581,15 @@
                         eventClick: (info) => {
                             const ev = info.event;
                             // Inverte o estado atual
-                            const novaRealizada = !ev.realized;
+                            const novaRealizada = !ev.extendedProps.realized;
                             // Atualiza o visual imediatamente no calendário
+                            ev.setExtendedProp('realized', novaRealizada);
                             ev.setProp('backgroundColor', novaRealizada ? '#28a745' : '#fd7e14');
-                            ev.setProp('realized', novaRealizada);
                             // Título com ✅ ou ❌
                             const simbolo = novaRealizada ? '✅' : '❌';
-                            ev.setProp('title', `${ev.title} ${simbolo}`);
+                            // Atualiza o título incluindo o símbolo (usando extendedProps para ler o valor)
+                            const tituloAtual = ev.title || '';
+                            ev.setProp('title', `${tituloAtual} ${simbolo}`);
                             // Salva no banco (PUT)
                             fetch("/api/agendamentos", {
                                 method: "PUT",
