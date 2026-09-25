@@ -57,7 +57,28 @@ public class GerenciadorArquivo {
         System.out.println("Erro ao salvar alunos no banco: " + e.getMessage());
     }
 }
-
+    public static void excluirAluno(String matricula) {
+        String sql = "DELETE FROM alunos WHERE matricula = ?";
+        try (Connection conn = conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, matricula);
+            int linhasAfetadas = stmt.executeUpdate();
+            System.out.println("Aluno excluído do Neon! Linhas afetadas: " + linhasAfetadas);
+        } catch (SQLException e) {
+            System.out.println("❌ Erro ao excluir aluno do banco: " + e.getMessage());
+        }
+    }
+        public static void excluirAgendamento(String id) {
+        String sql = "DELETE FROM agendamentos WHERE id = ?";
+        try (Connection conn = conectar();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, id);
+            int linhasAfetadas = stmt.executeUpdate();
+            System.out.println("Agendamento excluído do Neon! Linhas afetadas: " + linhasAfetadas);
+        } catch (SQLException e) {
+            System.out.println("❌ Erro ao excluir agendamento do banco: " + e.getMessage());
+        }
+    }
 private static String gerarMatriculaBD(Aluno a, java.util.Map<String, Integer> contadorDatas) {
     String dataBaseStr = "00000000";
     if (a.getDataNascimento() != null) {

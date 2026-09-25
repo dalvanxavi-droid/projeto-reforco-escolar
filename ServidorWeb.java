@@ -53,25 +53,27 @@ public class ServidorWeb {
                     List<Aluno> alunosOrdenados = new ArrayList<>(alunos);
                     alunosOrdenados.sort(java.util.Comparator.comparing(Aluno::getNome, String.CASE_INSENSITIVE_ORDER));
 
-                    Map<String, Integer> contadorDatas = new HashMap<>();
                     List<Map<String, Object>> listaJson = new ArrayList<>();
 
                     for (Aluno a : alunosOrdenados) {
-                        String matricula = gerarMatricula(a, contadorDatas);
+                        String matricula = a.getMatricula();
                         String respNome = a.getResponsavel() != null ? a.getResponsavel().nome() : "Sem cadastro";
                         String respFone = a.getResponsavel() != null ? a.getResponsavel().telefone() : "--";
                         String respEnd = a.getResponsavel() != null ? a.getResponsavel().endereco() : "";
                         String statusPag = a.getStatusPagamento() != null ? a.getStatusPagamento().name() : "PENDENTE";
-                        String statusPagDesc = a.getStatusPagamento() != null ? a.getStatusPagamento().getDescricao() : "Pendente";
+                        String statusPagDesc = a.getStatusPagamento() != null ? a.getStatusPagamento().getDescricao()
+                                : "Pendente";
 
                         Map<String, Object> item = new HashMap<>();
                         item.put("matricula", matricula);
                         item.put("nome", a.getNome());
-                        item.put("dataNascimento", a.getDataNascimento() != null ? a.getDataNascimento().toString() : "");
+                        item.put("dataNascimento",
+                                a.getDataNascimento() != null ? a.getDataNascimento().toString() : "");
                         item.put("anoEscolar", a.getAnoEscolar());
                         item.put("nivelLeitura", a.getNivelLeitura());
                         item.put("temNecessidade", a.isTemNecessidadeEspecial());
-                        item.put("descricaoNecessidade", a.getDescricaoNecessidade() != null ? a.getDescricaoNecessidade() : "");
+                        item.put("descricaoNecessidade",
+                                a.getDescricaoNecessidade() != null ? a.getDescricaoNecessidade() : "");
                         item.put("responsavelNome", respNome);
                         item.put("responsavelTelefone", respFone);
                         item.put("responsavelEndereco", respEnd);
@@ -94,20 +96,26 @@ public class ServidorWeb {
                     LocalDate dataNasc = LocalDate.parse(json.get("dataNascimento").getAsString());
                     String anoEscolar = json.get("anoEscolar").getAsString();
                     NivelLeitura nivel = NivelLeitura.valueOf(json.get("nivelLeitura").getAsString());
-                    boolean temNecessidade = json.has("temNecessidadeEspecial") && json.get("temNecessidadeEspecial").getAsBoolean();
-                    String descNee = json.has("descricaoNecessidade") ? json.get("descricaoNecessidade").getAsString() : "";
+                    boolean temNecessidade = json.has("temNecessidadeEspecial")
+                            && json.get("temNecessidadeEspecial").getAsBoolean();
+                    String descNee = json.has("descricaoNecessidade") ? json.get("descricaoNecessidade").getAsString()
+                            : "";
 
                     String nomeResp = json.has("nomeResponsavel") ? json.get("nomeResponsavel").getAsString() : "";
-                    String foneResp = json.has("telefoneResponsavel") ? json.get("telefoneResponsavel").getAsString() : "";
-                    String endResp = json.has("enderecoResponsavel") ? json.get("enderecoResponsavel").getAsString() : "";
+                    String foneResp = json.has("telefoneResponsavel") ? json.get("telefoneResponsavel").getAsString()
+                            : "";
+                    String endResp = json.has("enderecoResponsavel") ? json.get("enderecoResponsavel").getAsString()
+                            : "";
                     Responsavel resp = new Responsavel(nomeResp, foneResp, endResp);
 
                     double valorContrato = 1800.0;
                     if (json.has("valorContrato") && !json.get("valorContrato").getAsString().isEmpty()) {
                         valorContrato = json.get("valorContrato").getAsDouble();
                     }
-                    String cicloPagamento = json.has("cicloPagamento") ? json.get("cicloPagamento").getAsString() : "MENSAL";
-                    if (cicloPagamento.isEmpty()) cicloPagamento = "MENSAL";
+                    String cicloPagamento = json.has("cicloPagamento") ? json.get("cicloPagamento").getAsString()
+                            : "MENSAL";
+                    if (cicloPagamento.isEmpty())
+                        cicloPagamento = "MENSAL";
 
                     Aluno novo = new Aluno(nome, dataNasc, anoEscolar, resp, nivel, temNecessidade, descNee,
                             StatusPagamento.PENDENTE, valorContrato, cicloPagamento);
@@ -132,11 +140,17 @@ public class ServidorWeb {
                             a.setAnoEscolar(json.get("anoEscolar").getAsString());
                             a.setNivelLeitura(NivelLeitura.valueOf(json.get("nivelLeitura").getAsString()));
                             a.setTemNecessidadeEspecial(json.get("temNecessidadeEspecial").getAsBoolean());
-                            a.setDescricaoNecessidade(json.has("descricaoNecessidade") ? json.get("descricaoNecessidade").getAsString() : "");
+                            a.setDescricaoNecessidade(
+                                    json.has("descricaoNecessidade") ? json.get("descricaoNecessidade").getAsString()
+                                            : "");
 
                             String nomeR = json.has("nomeResponsavel") ? json.get("nomeResponsavel").getAsString() : "";
-                            String foneR = json.has("telefoneResponsavel") ? json.get("telefoneResponsavel").getAsString() : "";
-                            String endR = json.has("enderecoResponsavel") ? json.get("enderecoResponsavel").getAsString() : "";
+                            String foneR = json.has("telefoneResponsavel")
+                                    ? json.get("telefoneResponsavel").getAsString()
+                                    : "";
+                            String endR = json.has("enderecoResponsavel")
+                                    ? json.get("enderecoResponsavel").getAsString()
+                                    : "";
                             a.setResponsavel(new Responsavel(nomeR, foneR, endR));
 
                             if (json.has("valorContrato") && !json.get("valorContrato").getAsString().isEmpty()) {
@@ -160,7 +174,14 @@ public class ServidorWeb {
                     String body = lerBody(exchange);
                     JsonObject json = JsonParser.parseString(body).getAsJsonObject();
                     String matriculaInput = json.get("matricula").getAsString();
-
+                    System.out.println("=== DEBUG DELETE ===");
+                    System.out.println("Matricula recebida do front: [" + matriculaInput + "]");
+                    System.out.println("Total de alunos na lista: " + alunos.size());
+                    for (Aluno a : alunos) {
+                        System.out.println("  nome=[" + a.getNome() + "], matricula=[" + a.getMatricula()
+                                + "], dataNasc=[" + a.getDataNascimento() + "]");
+                    }
+                    System.out.println("====================");
                     Aluno alunoParaRemover = null;
                     for (Aluno a : alunos) {
                         if (a.getMatricula().equals(matriculaInput)) {
@@ -172,7 +193,27 @@ public class ServidorWeb {
                     if (alunoParaRemover != null) {
                         alunos.remove(alunoParaRemover);
                         final String matriculaFinal = alunoParaRemover.getMatricula();
+
+                        // NOVO: deletar o aluno do Neon
+                        GerenciadorArquivo.excluirAluno(matriculaFinal);
+
+                        // NOVO: capturar os IDs dos agendamentos desse aluno ANTES de remover da lista
+                        List<String> idsAgendamentos = new ArrayList<>();
+                        for (Agendamento ag : agendamentos) {
+                            if (ag.getMatriculaAluno().equals(matriculaFinal)) {
+                                idsAgendamentos.add(ag.getId());
+                            }
+                        }
+
+                        // Remover da lista em memória
                         agendamentos.removeIf(ag -> ag.getMatriculaAluno().equals(matriculaFinal));
+
+                        // NOVO: deletar cada agendamento do Neon
+                        for (String idAg : idsAgendamentos) {
+                            GerenciadorArquivo.excluirAgendamento(idAg);
+                        }
+
+                        // Manter o upsert pra sincronizar o resto (opcional, mas seguro)
                         GerenciadorArquivo.salvarAgendamentos(agendamentos);
                     }
 
@@ -181,11 +222,17 @@ public class ServidorWeb {
                     resposta.addProperty("status", "removido");
                     enviarResposta(exchange, 200, gson.toJson(resposta));
                 }
+
+                GerenciadorArquivo.salvarAlunos(new ArrayList<>(alunos));
+                JsonObject resposta = new JsonObject();
+                resposta.addProperty("status", "removido");
+                enviarResposta(exchange, 200, gson.toJson(resposta));
             }
         });
 
         // ROTA API: AGENDAMENTOS
         server.createContext("/api/agendamentos", new HttpHandler() {
+
             @Override
             public void handle(HttpExchange exchange) throws IOException {
                 // CORS
@@ -296,6 +343,8 @@ public class ServidorWeb {
                     final String idParam = tempId;
 
                     if (idParam != null && !idParam.isEmpty()) {
+                        // NOVO: deletar do Neon antes de remover da memória
+                        GerenciadorArquivo.excluirAgendamento(idParam);
                         agendamentos.removeIf(a -> a.getId().equals(idParam));
                     } else {
                         String body = lerBody(exchange);
@@ -303,12 +352,16 @@ public class ServidorWeb {
                             String[] ids = body.replace("[", "").replace("]", "").replace("\"", "").split(",");
                             for (String idItem : ids) {
                                 final String targetId = idItem.trim();
+                                // NOVO: deletar do Neon antes de remover da memória
+                                GerenciadorArquivo.excluirAgendamento(targetId);
                                 agendamentos.removeIf(a -> a.getId().trim().equals(targetId));
                             }
                         } else if (!body.isEmpty()) {
                             JsonObject json = JsonParser.parseString(body).getAsJsonObject();
                             if (json.has("id")) {
                                 final String targetId = json.get("id").getAsString();
+                                // NOVO: deletar do Neon antes de remover da memória
+                                GerenciadorArquivo.excluirAgendamento(targetId);
                                 agendamentos.removeIf(a -> a.getId().equals(targetId));
                             }
                         }
@@ -354,13 +407,12 @@ public class ServidorWeb {
 
                     if (matricula != null && novoStatusStr != null) {
                         StatusPagamento novoStatus = StatusPagamento.valueOf(novoStatusStr);
-                        Map<String, Integer> contadorDatas = new HashMap<>();
+
                         List<Aluno> ordenados = new ArrayList<>(alunos);
                         ordenados.sort(java.util.Comparator.comparing(Aluno::getNome, String.CASE_INSENSITIVE_ORDER));
 
                         for (Aluno a : ordenados) {
-                            String matGerada = gerarMatricula(a, contadorDatas);
-                            if (matGerada.equals(matricula)) {
+                            if (a.getMatricula().equals(matricula)) {
                                 a.setStatusPagamento(novoStatus);
                                 break;
                             }
@@ -434,14 +486,4 @@ public class ServidorWeb {
         return new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
     }
 
-    private static String gerarMatricula(Aluno a, Map<String, Integer> contadorDatas) {
-        String dataBaseStr = "00000000";
-        if (a.getDataNascimento() != null) {
-            dataBaseStr = a.getDataNascimento()
-                    .format(java.time.format.DateTimeFormatter.ofPattern("ddMMyyyy"));
-        }
-        int seq = contadorDatas.getOrDefault(dataBaseStr, 0) + 1;
-        contadorDatas.put(dataBaseStr, seq);
-        return dataBaseStr + String.format("%03d", seq);
-    }
 }

@@ -9,3 +9,4 @@
 
 # Variáveis de ambiente (senhas)
 .env
+backup/
