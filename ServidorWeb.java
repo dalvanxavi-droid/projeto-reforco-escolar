@@ -25,11 +25,13 @@ public class ServidorWeb {
 
     public static void main(String[] args) throws IOException {
         // === DIAGNÓSTICO: verificar variáveis de ambiente ===
+        // Importante: o console do Render fica na sua conta, então nunca imprimir
+        // senha ou DSN completos aqui. Hosts são mascarados via Auth.mascarar().
         System.out.println("=== DIAGNÓSTICO DE VARIÁVEIS DE AMBIENTE ===");
-        System.out.println("DB_URL: [" + System.getenv("DB_URL") + "]");
-        System.out.println("DB_USER: [" + System.getenv("DB_USER") + "]");
-        System.out.println("DB_PASSWORD: [" + (System.getenv("DB_PASSWORD") != null ? "DEFINIDA" : "NULL") + "]");
-        System.out.println("Todas as env vars: " + System.getenv().keySet());
+        System.out.println("DB_URL:      " + (System.getenv("DB_URL") == null ? "NULL (usando fallback)" : Auth.mascarar(System.getenv("DB_URL"))));
+        System.out.println("DB_USER:     " + (System.getenv("DB_USER") == null ? "NULL (usando fallback)" : "DEFINIDA"));
+        System.out.println("DB_PASSWORD: " + (System.getenv("DB_PASSWORD") == null ? "NULL (usando fallback)" : "DEFINIDA"));
+        System.out.println("SENHA_ACESSO:" + (Auth.configurado() ? " DEFINIDA" : " NÃO CONFIGURADA -- ninguém conseguirá entrar no sistema"));
         System.out.println("============================================");
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
@@ -42,6 +44,13 @@ public class ServidorWeb {
                 exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
                 exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
                 exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+                exchange.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
+
+                // SEGURANÇA: toda rota /api/* exige sessão válida
+                if (!Auth.sessaoValida(Auth.tokenDaRequisicao(exchange))) {
+                    Auth.negar(exchange);
+                    return;
+                }
 
                 if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
                     exchange.sendResponseHeaders(204, -1);
@@ -239,6 +248,13 @@ public class ServidorWeb {
                 exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
                 exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
                 exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+                exchange.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
+
+                // SEGURANÇA: toda rota /api/* exige sessão válida
+                if (!Auth.sessaoValida(Auth.tokenDaRequisicao(exchange))) {
+                    Auth.negar(exchange);
+                    return;
+                }
 
                 if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
                     exchange.sendResponseHeaders(204, -1);
@@ -382,6 +398,13 @@ public class ServidorWeb {
                 exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
                 exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "PUT, OPTIONS");
                 exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+                exchange.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
+
+                // SEGURANÇA: toda rota /api/* exige sessão válida
+                if (!Auth.sessaoValida(Auth.tokenDaRequisicao(exchange))) {
+                    Auth.negar(exchange);
+                    return;
+                }
 
                 if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
                     exchange.sendResponseHeaders(204, -1);
@@ -463,6 +486,78 @@ public class ServidorWeb {
                 OutputStream os = exchange.getResponseBody();
                 java.nio.file.Files.copy(file.toPath(), os);
                 os.close();
+            }
+        });
+
+        // ROTA API: LOGIN
+        // GET  /api/login   -> {"logado": true|false}   (não exige sessão)
+        // POST /api/login   -> valida a senha e devolve o cookie de sessão
+        server.createContext("/api/login", new HttpHandler() {
+            @Override
+            public void handle(HttpExchange exchange) throws IOException {
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+                exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+                exchange.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
+
+                if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                    exchange.sendResponseHeaders(204, -1);
+                    return;
+                }
+
+                if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
+                    // Pergunta rápida do front: "eu já tô logado?"
+                    boolean logado = Auth.sessaoValida(Auth.tokenDaRequisicao(exchange));
+                    enviarResposta(exchange, 200, gson.toJson(Map.of("logado", logado)));
+                    return;
+                }
+
+                if ("POST".equalsIgnoreCase(exchange.getRequestMethod())) {
+                    if (!Auth.configurado()) {
+                        // Falha barulhenta no deploy errado: ninguém entra, mas a mensagem
+                        // explica o motivo em vez de só dar "senha incorreta".
+                        enviarResposta(exchange, 500, gson.toJson(Map.of("erro", "Servidor sem SENHA_ACESSO configurada")));
+                        return;
+                    }
+
+                    // {"usuario":"Lidiane","senha":"xxx"} — usuário é ignorado, só a senha importa
+                    JsonObject corpo = JsonParser.parseString(lerBody(exchange)).getAsJsonObject();
+                    String senha = corpo.has("senha") ? corpo.get("senha").getAsString() : "";
+
+                    if (!Auth.validarSenha(senha)) {
+                        // Mensagem idêntica às de sucesso: quem tenta descobrir só
+                        // percebe que "não entrou", sem saber se foi senha ou configuração.
+                        enviarResposta(exchange, 401, gson.toJson(Map.of("erro", "Senha incorreta")));
+                        return;
+                    }
+
+                    String token = Auth.criarSessao();
+                    exchange.getResponseHeaders().set("Set-Cookie", Auth.cookieSessao(token));
+                    enviarResposta(exchange, 200, gson.toJson(Map.of("logado", true)));
+                    return;
+                }
+
+                enviarResposta(exchange, 405, gson.toJson(Map.of("erro", "Método não permitido")));
+            }
+        });
+
+        // ROTA API: LOGOUT — encerra a sessão e pede ao navegador que apague o cookie
+        server.createContext("/api/logout", new HttpHandler() {
+            @Override
+            public void handle(HttpExchange exchange) throws IOException {
+                exchange.getResponseHeaders().add("Access-Control-Allow-Origin", "*");
+                exchange.getResponseHeaders().add("Access-Control-Allow-Methods", "POST, OPTIONS");
+                exchange.getResponseHeaders().add("Access-Control-Allow-Headers", "Content-Type");
+                exchange.getResponseHeaders().add("Access-Control-Allow-Credentials", "true");
+
+                if ("OPTIONS".equalsIgnoreCase(exchange.getRequestMethod())) {
+                    exchange.sendResponseHeaders(204, -1);
+                    return;
+                }
+
+                Auth.encerrarSessao(Auth.tokenDaRequisicao(exchange));
+                exchange.getResponseHeaders().set("Set-Cookie", Auth.cookieLimpar());
+                enviarResposta(exchange, 200, gson.toJson(Map.of("logado", false)));
             }
         });
 

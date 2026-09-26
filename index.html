@@ -613,6 +613,149 @@
             border: 1px solid var(--borda);
             font-size: 12px;
         }
+
+        /* ===== TELA DE LOGIN =====
+           Quando body.blockeado está ativo, o CSS abaixo esconde a sidebar/main
+           e deixa visível SOMENTE o <section class="login-overlay">. Sem isso a
+           sidebar apareceria vazia atrás da tela de login. */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            /* Mesmo papel de plantas do fundo da página, mas com o verde mais forte */
+            background: var(--cor-primaria);
+            background-image:
+                url("data:image/svg+xml,%3Csvg width='140' height='120' viewBox='0 0 140 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 120 Q20 60 10 20 M70 120 Q70 50 55 10 M120 120 Q125 70 135 20' stroke='%23ffffff' stroke-opacity='0.08' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+        }
+
+        body.blockeado aside,
+        body.blockeado main {
+            display: none;
+        }
+
+        body.blockeado .login-overlay {
+            display: flex;
+        }
+
+        .login-card {
+            background: var(--branco);
+            padding: 44px 40px 38px;
+            border-radius: 22px;
+            width: 420px;
+            max-width: 92%;
+            box-shadow: 0 22px 60px rgba(0, 0, 0, 0.28);
+            text-align: center;
+        }
+
+        .login-icone {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: var(--cor-secundaria);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 44px;
+            margin: 0 auto 18px;
+        }
+
+        .login-card h2 {
+            color: var(--cor-primaria);
+            font-size: 24px;
+            margin-bottom: 6px;
+        }
+
+        .login-card .login-slogan {
+            color: var(--texto-secundario);
+            font-size: 13px;
+            margin-bottom: 30px;
+        }
+
+        .login-campo {
+            text-align: left;
+            margin-bottom: 16px;
+        }
+
+        .login-campo label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--texto-principal);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .login-campo input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--borda);
+            border-radius: 10px;
+            font-size: 15px;
+            background: #fbfdfc;
+            color: var(--texto-principal);
+            transition: border-color 0.2s;
+        }
+
+        .login-campo input:focus {
+            outline: none;
+            border-color: var(--cor-primaria);
+            background: var(--branco);
+        }
+
+        .login-botao {
+            width: 100%;
+            padding: 13px;
+            background: var(--cor-primaria);
+            color: var(--branco);
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 8px;
+        }
+
+        .login-botao:hover {
+            background: var(--cor-primaria-hover);
+        }
+
+        .login-botao:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .login-erro {
+            margin-top: 16px;
+            padding: 10px 14px;
+            background: #fdecec;
+            color: #b93221;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        /* Botão de sair no topo, lado do card da professora */
+        .btn-sair {
+            background: var(--branco);
+            border: 1px solid var(--borda);
+            color: var(--texto-secundario);
+            padding: 10px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-sair:hover {
+            background: var(--cor-primaria);
+            color: var(--branco);
+            border-color: var(--cor-primaria);
+        }
     </style>
 </head>
 
@@ -641,6 +784,31 @@
         </div>
     </aside>
 
+    <!-- TELA DE LOGIN (aparece quando body.blockeado está ativo)
+         Fica FORA do <main> propositalmente: o CSS esconde aside/main quando
+         bloqueado, então a tela de login precisa estar num ponto não afetado. -->
+    <section class="login-overlay">
+        <div class="login-card">
+            <div class="login-icone">🌱</div>
+            <h2>Sementes do Saber</h2>
+            <p class="login-slogan">Aprender com carinho, crescer com confiança.</p>
+
+            <form onsubmit="entrar(event)">
+                <div class="login-campo">
+                    <label for="login-usuario">Usuário</label>
+                    <input type="text" id="login-usuario" value="Lidiane" autocomplete="username">
+                </div>
+                <div class="login-campo">
+                    <label for="login-senha">Senha</label>
+                    <input type="password" id="login-senha" autocomplete="current-password" required autofocus>
+                </div>
+                <button type="submit" class="login-botao" id="btn-entrar">Entrar</button>
+            </form>
+
+            <div id="login-erro" class="login-erro" style="display:none;"></div>
+        </div>
+    </section>
+
     <!-- CONTEÚDO PRINCIPAL -->
     <main>
         <!-- TOPO / CABEÇALHO -->
@@ -657,6 +825,7 @@
                         <p>Professora</p>
                     </div>
                 </div>
+                <button class="btn-sair" onclick="sair()" title="Sair do sistema">🚪 Sair</button>
             </div>
         </div>
 
@@ -1128,6 +1297,17 @@
         }
 
         function navegar(tela) {
+            // Trava dupla: o backend já devolve 401, mas não queremos exibir
+            // telas vazias por um instante. Redireciona para login se necessário.
+            if (!logado && tela !== 'login') tela = 'login';
+
+            // A tela de login não é uma ".tela" comum (fica fora de <main>)
+            // e usa o CSS body.blockeado para aparecer. Nada mais a fazer.
+            if (tela === 'login') {
+                telaAtual = tela;
+                return;
+            }
+
             telaAtual = tela;
             document.querySelectorAll('.tela').forEach(t => t.classList.remove('ativa'));
             document.querySelectorAll('aside nav a').forEach(b => b.classList.remove('ativo'));
@@ -1764,7 +1944,88 @@
                 .then(() => carregarFinanceiro());
         }
 
+        // ===== AUTENTICAÇÃO =====
+
+        let logado = false;   // espelha o estado da sessão no navegador
+
+        /**
+         * Envio do formulário de login.
+         * @param {Event} e evento submit do <form>; chamar preventDefault()
+         *                  para evitar o reload clássico da página.
+         */
+        async function entrar(e) {
+            e.preventDefault();
+            const senha = document.getElementById('login-senha').value;
+            const btn = document.getElementById('btn-entrar');
+            const caixaErro = document.getElementById('login-erro');
+
+            btn.disabled = true;
+            btn.textContent = 'Entrando...';
+            caixaErro.style.display = 'none';
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        usuario: document.getElementById('login-usuario').value,
+                        senha: senha
+                    })
+                });
+                const dados = await res.json();
+
+                if (res.ok && dados.logado) {
+                    // Sessão criada no servidor; o cookie já veio no header Set-Cookie
+                    // e o navegador guardou sozinho. Não precisamos guardar nada aqui.
+                    logado = true;
+                    document.body.classList.remove('blockeado');
+                    navegar('dashboard');
+                    await carregarAlunos();
+                    await carregarTabelaEAgenda();
+                } else {
+                    caixaErro.textContent = dados.erro || 'Não foi possível entrar. Tente novamente.';
+                    caixaErro.style.display = 'block';
+                }
+            } catch (erro) {
+                caixaErro.textContent = 'Servidor indisponível. Verifique sua conexão.';
+                caixaErro.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Entrar';
+                document.getElementById('login-senha').value = '';
+                document.getElementById('login-senha').focus();
+            }
+        }
+
+        /** Encerra a sessão no servidor e volta para a tela de login. */
+        async function sair() {
+            try { await fetch('/api/logout', { method: 'POST' }); } catch (_) { /* segue */ }
+            logado = false;
+            document.body.classList.add('blockeado');
+            navegar('login');
+        }
+
         async function inicializarSistema() {
+            // Primeira coisa: perguntar ao servidor se já há uma sessão válida.
+            // GET /api/login responde {"logado":true|false} e NÃO exige cookie,
+            // mas LEVA o cookie se o navegador tiver um. É assim que a página
+            // "lembra" de quem você é ao recarregar.
+            try {
+                const res = await fetch('/api/login');
+                const dados = await res.json();
+                logado = !!dados.logado;
+            } catch (_) {
+                logado = false;   // servidor fora do ar: trata como deslogado
+            }
+
+            document.body.classList.toggle('blockeado', !logado);
+
+            if (!logado) {
+                navegar('login');
+                return;              // não carrega nada; espera o usuário entrar
+            }
+
+            navegar('dashboard');
             await carregarAlunos();
             await carregarTabelaEAgenda();
             carregarDiario();
