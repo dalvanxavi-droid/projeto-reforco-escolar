@@ -42,7 +42,7 @@ public class Auth {
     private static final String SENHA_ESPERADA =
             System.getenv("SENHA_ACESSO") != null
                     ? System.getenv("SENHA_ACESSO")
-                    : "AcessoLidiane2026!";
+                    : "220815@Lidi";
 
     // --- SENHA ---
 
